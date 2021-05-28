@@ -21,7 +21,7 @@ class UserListView(View):
                 return JsonResponse({"message": "EMAIL_KEY_ERROR"}, status =  400)
             if len(password) < 8 or len(password) > 15:
                 return JsonResponse({"message": "PASSWORD_ERROR"}, status =  400)
-
+            
             User.objects.create(email=email,
                                 password=password,
                                 phone_num=phone_num,

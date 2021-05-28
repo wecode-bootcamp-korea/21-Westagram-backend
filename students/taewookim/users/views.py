@@ -10,7 +10,7 @@ EMAIL_REGEX    = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,50}$'
 PASSWORD_REGEX = '^.{8,30}$'
 NICKNAME_REGEX = '^.{2,10}$'
 PHONE_REGEX    = '^01[016789]\-\d{3,4}\-\d{4}$'
- 
+
 class UserView(View):
     def post(self, request):
         try:
@@ -26,7 +26,7 @@ class UserView(View):
             if not re.match(PASSWORD_REGEX, password):
                 return JsonResponse({"result": "INVALIED_PASSWORD"}, status=400)
 
-            if User.objects.match(email=email).exists() :
+            if User.objects.filter(email=email).exists() :
                 return JsonResponse({"result": "DUPLICATED_EMAIL"}, status=409)
 
             if nickname is not None:

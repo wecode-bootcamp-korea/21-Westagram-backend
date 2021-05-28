@@ -1,8 +1,9 @@
 import re
 import json
-from django.db.models.fields import related
+
 from django.views import View
-from django.http import JsonResponse 
+from django.http  import JsonResponse 
+
 from .models import User
 
 
@@ -10,8 +11,8 @@ from .models import User
 
 class UserView(View):
     def post(self,request):
-        data = json.loads(request.body)
-        regex ='^[a-z0-9]+[\._]?[]+[@]\w+[.]\w{2,3}$'
+        data     = json.loads(request.body)
+        regex    ='^[a-z0-9]+[\._]?[]+[@]\w+[.]\w{2,3}$'
         PASSWORD = 8
 
         
@@ -22,15 +23,17 @@ class UserView(View):
             if len(data['password']) <PASSWORD:
                 return JsonResponse({'MESSAGE':'PASS_KEY_ERROR'},status=400)
             
-            if User.objects.filter(email=data['email']):
+            if User.objects.filter(email = data['email']):
                 return JsonResponse({'MESSAGE':'USER_ALREADY_EXISIS'},status=400)
             
-            if User.objects.filter(nicname=data['nicname']):
+            if User.objects.filter(nickname = data['nickname']):
                 return JsonResponse({'MESSAGE':'USER_ALREADY_EXISIS'},status=400)
+            
+            if User.objects.filter(phone_number=data['phone_number']):
+               return JsonResponse({'MESSAGE':'USER_ALREADY_EXISIS'},status=400)
 
- 
-            user = User.objects.create(
-                nickname       = data['name'],
+            User.objects.create(
+                nickname       = data['nickname'],
                 password       = data['password'],
                 email          = data['email'],
                 phone_number   = data['mobile']
@@ -40,8 +43,8 @@ class UserView(View):
 
             
             
-        except:
-            return JsonResponse({'message':'SUCCESS!'},status=200)
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'},status=400)
 
       
-    
+

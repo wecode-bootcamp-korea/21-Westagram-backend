@@ -4,7 +4,7 @@ from json.decoder           import JSONDecodeError
 from django.views           import View
 from django.http.response   import JsonResponse
 
-from .models              import User
+from .models                import User
 
 EMAIL_REGEX    = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,50}$'
 PASSWORD_REGEX = '^.{8,30}$'

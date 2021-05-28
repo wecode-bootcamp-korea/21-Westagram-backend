@@ -21,20 +21,20 @@ class SignUpView(View):
             if not email or not password:
                 return JsonResponse({"message": "KEY_ERROR"}, status = 400)
 
-            if not re.match(email_regex , email):
-                return JsonResponse({"message": "INVALID_VALUE"}, status = 400)
+            if not re.match(email_regex, email):
+                return JsonResponse({"message":"INVALID_VALUE"}, status = 400)
 
             if User.objects.filter(email=email):
-                return JsonResponse({"message": "DUPLICATE EMAIL"})
+                return JsonResponse({"message":"DUPLICATE EMAIL"}, status = 400)
 
             if User.objects.filter(phone_num=phone_num):
-                return JsonResponse({"message": "DUPLICATE PHONE NUMBER"})
+                return JsonResponse({"message":"DUPLICATE PHONE NUMBER"}, status = 400)
 
             if User.objects.filter(name=name):
-                return JsonResponse({"message": "DUPLICATE NAME"})
+                return JsonResponse({"message":"DUPLICATE NAME"}, status = 400)
 
             if not re.match(password_regex, password):
-                return JsonResponse({"message": "SHORT PASSWORD"}, status =400)
+                return JsonResponse({"message":"SHORT PASSWORD"}, status = 400)
             
             User.objects.create(
                 name      = name, 
@@ -46,4 +46,4 @@ class SignUpView(View):
             return JsonResponse({"result":"SUCCESS"}, status = 201)
             
         except KeyError:
-            return JsonResponse({"message": "KEY_ERROR"}, status = 400)
+            return JsonResponse({"message":"KEY_ERROR"}, status = 400)

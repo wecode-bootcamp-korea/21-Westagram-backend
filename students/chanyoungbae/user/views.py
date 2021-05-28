@@ -26,12 +26,14 @@ class SignUpView(View):
 
             if User.objects.filter(email=email):
                 return JsonResponse({"message":"DUPLICATE EMAIL"}, status = 400)
+            
+            if phone_num:
+                if User.objects.filter(phone_num=phone_num):
+                    return JsonResponse({"message":"DUPLICATE PHONE NUMBER"}, status = 400)
 
-            if User.objects.filter(phone_num=phone_num):
-                return JsonResponse({"message":"DUPLICATE PHONE NUMBER"}, status = 400)
-
-            if User.objects.filter(name=name):
-                return JsonResponse({"message":"DUPLICATE NAME"}, status = 400)
+            if name:    
+                if User.objects.filter(name=name):
+                    return JsonResponse({"message":"DUPLICATE NAME"}, status = 400)
 
             if not re.match(password_regex, password):
                 return JsonResponse({"message":"SHORT PASSWORD"}, status = 400)

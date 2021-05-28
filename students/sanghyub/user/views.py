@@ -6,7 +6,7 @@ from django.views import View
 from django.http  import JsonResponse, HttpResponse 
 from django.core  import exceptions, validators
 
-from .models     import User
+from .models      import User
 
 
 regEXP_email = re.compile('^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')

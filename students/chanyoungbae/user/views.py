@@ -18,15 +18,13 @@ class SignUpView(View):
             email_regex    = '^([\w\.\-_]+)?\w+@[\w]+(\.\w+){1,}$'
             password_regex = '^([a-zA-Z0-9~!@#$%^&*()_+]).{7,}$'
 
-            
-
             if not email or not password:
                 return JsonResponse({"message": "KEY_ERROR"}, status = 400)
 
-            if re.match(email_regex , email) == None :
+            if not re.match(email_regex , email):
                 return JsonResponse({"message": "INVALID_VALUE"}, status = 400)
 
-            if re.match(password_regex, password) == None:
+            if not re.match(password_regex, password):
                 return JsonResponse({"message": "SHORT PASSWORD"}, status =400)
             
             User.objects.create(
@@ -39,4 +37,4 @@ class SignUpView(View):
             return JsonResponse({"result":"SUCCESS"}, status = 201)
             
         except KeyError:
-            return JsonResponse({"message": "KEY_ERRORs"}, status = 400)
+            return JsonResponse({"message": "KEY_ERROR"}, status = 400)

@@ -21,7 +21,12 @@ class SignupView(View):
 
             if not password_regex.search(data['password']):
                 return JsonResponse({'message': 'INVAILD_PASSWORD'})
-            
+        
+            phone_number_regex = re.compile('\d{2,3}-\d{3,4}-\d{4}')
+
+            if not phone_number_regex.search(data['phone_number']):
+                return JsonResponse({'message': 'INVALID_PHONE_NUMBER'})
+
             User.objects.create (
                 email        = data['email'],
                 password     = data['password'],

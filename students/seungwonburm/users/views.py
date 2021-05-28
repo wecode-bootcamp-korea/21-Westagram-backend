@@ -10,15 +10,16 @@ class SignupView(View):
     def post(self, request):
         MIN_PASSWORD_LENGTH = 8
         try:
-            data = json.loads(request.body)
-            email = data['email']
-            password = data['password']
-            nickname = data['nickname']
-            phone_number = data['phone_number']
+            data            = json.loads(request.body)
+            email           = data['email']
+            password        = data['password']
+            nickname        = data['nickname']
+            phone_number    = data['phone_number']
 
             if email and password:
                 email_regex = "(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
                 password_regex = "^(?=.*).{8,}$"
+
                 if not re.search(password_regex, password):
                     return JsonResponse({'message' : 'VALIDATION ERROR : INVALID PASSWORD'}, status = 400)
                 if not re.search(email_regex, email):

@@ -19,7 +19,7 @@ class UserView(View):
             return [False, 'KEY_ERROR', 'EMAIL']
         elif password == '' or len(password) < 8:
             return [False, 'KEY_ERROR', 'PASSWORD']
-        elif phone_no == '' or re.compile('').match() == None:
+        elif phone_no == '':
             return [False, 'KEY_ERROR', 'PHONE_NO']
         elif full_nm == '':
             return [False, 'KEY_ERROR', 'FULL_NM']

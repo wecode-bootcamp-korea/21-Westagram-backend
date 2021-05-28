@@ -1,4 +1,5 @@
 import json
+import re
 
 from django.views import View
 from django.http  import JsonResponse
@@ -14,14 +15,12 @@ class UserListView(View):
             password  = data['password']
             phone_num = data['phone_num']
             nick_name = data['nick_name']
-
-            if '.' not in email:
-                return JsonResponse({"message": "EMAIL_KEY_ERROR"}, status =  400)
-            elif '@' not in email:
-                return JsonResponse({"message": "EMAIL_KEY_ERROR"}, status =  400)
             
-            if len(password) < 8:
-                return JsonResponse({"message": "PASSWORD_SHORT"}, status =  400)
+            email_regex = re.compile('^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
+            if not email_regex.match(email):
+                return JsonResponse({"message": "EMAIL_KEY_ERROR"}, status =  400)
+            if len(password) < 8 or len(password) > 15:
+                return JsonResponse({"message": "PASSWORD_ERROR"}, status =  400)
 
             User.objects.create(email=email,
                                 password=password,

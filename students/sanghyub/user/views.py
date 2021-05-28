@@ -22,7 +22,7 @@ class UserSignIn(View) :
                 return JsonResponse({"message":"IMPROPER input"}, status= 400)
             
             for person in User.objects.all():
-                if data["email"] == person.email or data["name"] == person.name or data["phone_number"] == person.phone_number:
+                if data["email"] == person.email or data["nickname"] == person.name or data["phone_number"] == person.phone_number:
                     return JsonResponse({"message": "accout_info already exists"},status=400)
 
             User.objects.create(

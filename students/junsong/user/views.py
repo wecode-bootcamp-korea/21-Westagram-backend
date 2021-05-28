@@ -1,26 +1,46 @@
 import json
+from json.decoder import JSONDecodeError
 
 from django.views import View
-from django.http import JsonResponse
+from django.http  import JsonResponse
 
+from .models import User
 
+class SignUp(View):
+    def post(self, request):
+        data     = json.loads(request.body)
+        email    = data['email']
+        password = data['password']
+        nickname = data['nickname']
+        contact  = data['contact']
 
+        try:
+            if ('@' or '.') not in email:
+                return JsonResponse({"message": "올바르지 않은 이메일 형식입니다."}, status=400)
 
+            elif User.objects.filter(email=email).exists():
+                return JsonResponse({"message": "이미 존재하는 계정입니다."}, status=400)
 
+            elif len(password) < 8:
+                return JsonResponse({"message": "비밀번호는 8자리 이상으로 만들어주세요."}, status=400)
 
+            elif (contact != '') and User.objects.filter(contact=contact).exists():
+                return JsonResponse({"message": "중복된 연락처입니다."}, status=400)
 
-#     email = models.EmailField(max_length=128)
-#     password = models.CharField(max_length=20)
-#     nickname = models.CharField(max_length=20, blank=True)
-#     contact = models.IntegerField(null=True)
+            elif (nickname != '') and User.objects.filter(nickname=nickname).exists():
+                return JsonResponse({"message": "중복된 닉네임입니다."}, status=400)
 
-# 생성한 사용자 클래스를 불러옵니다. 한 번에 모든 클래스를 import 해서는 안됩니다. 내가 사용할 클래스를 정확히 지칭해주세요
-# 인스타그램에 회원가입 할 때에는 사용자 계정으로 이메일을 필수로 필요합니다.
-# 인스타그램에 회원가입 할 때에는 비밀번호도 필수로 필요합니다.
-# 회원가입 할 때 핸드폰 번호와 닉네임도 추가로 저장합니다.
-# 이메일이나 패스워드 키가 전달되지 않았을 시, {"message": "KEY_ERROR"}, status code 400 을 반환합니다.
-# 회원가입시 이메일을 사용할 경우, 이메일에는 @와 .이 필수로 포함되어야 합니다. 해당 조건이 만족되지 않을 시 적절한 에러를 반환해주세요. 이 과정을 email validation이라고 합니다.
-# 회원가입시 비밀번호는 8자리 이상이어야만 합니다. 해당 조건이 만족되지 않을 시, 적절한 에러를 반환해주세요. 이 과정을 password validation이라고 합니다.
-# 회원가입시 서로 다른 사람이 같은 전화번호나 사용자 이름, 이메일을 사용하지 않으므로 기존에 존재하는 자료와 중복되어서는 안됩니다. 적절한 에러를 반환해주세요.
-# 회원가입이 성공하면 {"message": "SUCCESS"}, status code 201을 반환합니다.
-# [추가 구현 사항] -> email validation 또는 password validation 과정에서 정규식을 사용해보세요.
+            else:
+                User.objects.create(
+                    email    = email,
+                    password = password,
+                    nickname = nickname,
+                    contact  = contact
+                )
+                return JsonResponse({"message": "SUCCESS"}, status=201)
+
+        except KeyError:
+            return JsonResponse({"message": "KEY_ERROR"}, status=400)
+        
+        except JSONDecodeError:
+            return JsonResponse({"message": "EMPTY_BODY_DATA"}, status=400)

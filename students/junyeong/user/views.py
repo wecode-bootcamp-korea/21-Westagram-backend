@@ -9,7 +9,6 @@ from django.db.models  import Q
 
 from .models      import User
 
-
 email_regex = '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
 password_regex = '^[a-zA-Z0-9!@#$%^&*()-_+={}\|\\\/].{7,}$'
 
@@ -17,7 +16,6 @@ class SignupView(View):
 
     def post(self, request):
         
-
         try:
             data = json.loads(request.body)
 
@@ -34,8 +32,7 @@ class SignupView(View):
             
             if not re.search(password_regex, password):
                 return JsonResponse({'message': '패스워드 형식이 아닙니다.'}, status= 400)
-            
-            
+    
             if User.objects.filter(
                 Q(nickname = nickname) | Q(phone_number = phone_number) | Q(email = email)):
                 return JsonResponse({'message': '입력된 정보가 중복되었습니다.'}, status= 409)

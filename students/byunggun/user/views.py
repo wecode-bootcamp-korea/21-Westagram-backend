@@ -53,11 +53,11 @@ class UserView(View):
                 }, status=400)
             
             User.objects.create(
-                email=user_datas['email'],
-                password=user_datas['password'],
-                phone_no=user_datas['phone_no'],
-                full_nm=user_datas['full_nm'],
-                user_nm=user_datas['user_nm']
+                email    = user_datas['email'],
+                password = user_datas['password'],
+                phone_no = user_datas['phone_no'],
+                full_nm  = user_datas['full_nm'],
+                user_nm  = user_datas['user_nm']
             )
 
             return JsonResponse({'result':'SUCCESS'}, status=201)

@@ -20,10 +20,10 @@ class UserView(View):
             nickname     = data.get('nickname')
             phone_number = data.get('phone_number')
 
-            if re.compile(EMAIL_REGEX).match(email) == None:
+            if not re.compile(EMAIL_REGEX).match(email):
                 return JsonResponse({"result": "INVALIED_EMAIL"}, status=400)
 
-            if re.compile(PASSWORD_REGEX).match(password) == None:
+            if not re.compile(PASSWORD_REGEX).match(password):
                 return JsonResponse({"result": "INVALIED_PASSWORD"}, status=400)
 
             if User.objects.filter(email=email).exists() :

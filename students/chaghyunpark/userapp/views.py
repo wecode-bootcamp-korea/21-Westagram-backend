@@ -19,18 +19,19 @@ class UserView(View):
         try:
             if not (re.search(regex, data['email'])):
                 return JsonResponse({'MESSAGE':'EMAIL_KEY_ERROR'},status=400)
+
             
             if len(data['password']) <PASSWORD:
                 return JsonResponse({'MESSAGE':'PASS_KEY_ERROR'},status=400)
             
             if User.objects.filter(email = data['email']):
-                return JsonResponse({'MESSAGE':'USER_ALREADY_EXISIS'},status=400)
-            
+                 return JsonResponse({'MESSAGE':'USER_ALREADY_EXISIS'},status=400)
+
             if User.objects.filter(nickname = data['nickname']):
                 return JsonResponse({'MESSAGE':'USER_ALREADY_EXISIS'},status=400)
-            
-            if User.objects.filter(phone_number=data['phone_number']):
-               return JsonResponse({'MESSAGE':'USER_ALREADY_EXISIS'},status=400)
+
+            if User.objects.filter(phone_number=data['mobile']):
+                return JsonResponse({'MESSAGE':'USER_ALREADY_EXISIS'},status=400)
 
             User.objects.create(
                 nickname       = data['nickname'],

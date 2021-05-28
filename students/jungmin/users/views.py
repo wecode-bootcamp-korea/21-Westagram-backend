@@ -1,15 +1,18 @@
-from django.views import View
-from django.http import JsonResponse
-from .models import User
-import json , re
+import json ,re
 
-re_email = '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+from django.views   import View
+from django.http    import JsonResponse
+
+from .models        import User
+
+
+re_email    = '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
 re_password = '^[A-Za-z\d$@$!%^()*#?&]{8,}$'
 
 class UserView(View):
     def post(self, request):
         try:
-            data = json.loads(request.body)
+            data         = json.loads(request.body)
             user_name    = data['user_name']
             phone_number = data['phone_number']
             user_email   = data['user_email']
@@ -21,7 +24,6 @@ class UserView(View):
             
             if not re.compile(re_password).match(password):
                 return JsonResponse({"message":"The password is not appropriate"}, status=400)
-
 
             if not user_email or not password:
                 return JsonResponse({"message":"KEY_ERROR"}, status=400)
@@ -42,8 +44,6 @@ class UserView(View):
                 user_email   = user_email,
                 password     = password
             )
-
-
             return JsonResponse({'message':'SUCCESS'}, status = 201)
 
         except KeyError:

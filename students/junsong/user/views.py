@@ -14,6 +14,11 @@ class SignUp(View):
         nickname = data['nickname']
         contact  = data['contact']
 
+        # EMAIL_REGEX    = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,50}$'
+        # PASSWORD_REGEX = '^.{8,30}$'
+        # NICKNAME_REGEX = '^.{2,10}$'
+        # CONTACT_REGEX    = '^01[016789]\-\d{3,4}\-\d{4}$'
+
         try:
             if ('@' or '.') not in email:
                 return JsonResponse({"message": "올바르지 않은 이메일 형식입니다."}, status=400)
@@ -30,14 +35,13 @@ class SignUp(View):
             if (nickname != '') and User.objects.filter(nickname=nickname).exists():
                 return JsonResponse({"message": "중복된 닉네임입니다."}, status=409)
 
-            else:
-                User.objects.create(
-                    email    = email,
-                    password = password,
-                    nickname = nickname,
-                    contact  = contact
-                )
-                return JsonResponse({"message": "SUCCESS"}, status=201)
+            User.objects.create(
+                email    = email,
+                password = password,
+                nickname = nickname,
+                contact  = contact
+            )
+            return JsonResponse({"message": "SUCCESS"}, status=201)
 
         except KeyError:
             return JsonResponse({"message": "KEY_ERROR"}, status=400)

@@ -1,8 +1,9 @@
-import json
+import json, re
 from json.decoder import JSONDecodeError
 
-from django.views import View
-from django.http  import JsonResponse
+from django.views     import View
+from django.http      import JsonResponse
+from django.db.models import Q
 
 from .models import User
 
@@ -14,26 +15,17 @@ class SignUp(View):
         nickname = data['nickname']
         contact  = data['contact']
 
-        # EMAIL_REGEX    = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,50}$'
-        # PASSWORD_REGEX = '^.{8,30}$'
-        # NICKNAME_REGEX = '^.{2,10}$'
-        # CONTACT_REGEX    = '^01[016789]\-\d{3,4}\-\d{4}$'
+        EMAIL_REGEX = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,128}$'
 
         try:
-            if ('@' or '.') not in email:
+            if not re.match(EMAIL_REGEX, email):
                 return JsonResponse({"message": "올바르지 않은 이메일 형식입니다."}, status=400)
-
-            if User.objects.filter(email=email).exists():
-                return JsonResponse({"message": "이미 존재하는 계정입니다."}, status=409)
 
             if len(password) < 8:
                 return JsonResponse({"message": "비밀번호는 8자리 이상으로 만들어주세요."}, status=400)
-
-            if (contact != '') and User.objects.filter(contact=contact).exists():
-                return JsonResponse({"message": "중복된 연락처입니다."}, status=409)
-
-            if (nickname != '') and User.objects.filter(nickname=nickname).exists():
-                return JsonResponse({"message": "중복된 닉네임입니다."}, status=409)
+                
+            if User.objects.filter(Q(email=email)|Q(contact=contact)|Q(nickname=nickname)).exists():
+                return JsonResponse({"message": "이미 존재하는 회원정보입니다."}, status=409)
 
             User.objects.create(
                 email    = email,

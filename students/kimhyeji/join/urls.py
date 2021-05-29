@@ -1,5 +1,5 @@
 from django.urls import path
-#from .views import
+from .views import JoinView
 
 
 
@@ -7,7 +7,7 @@ from django.urls import path
 
 urlpatterns = [
    
-   #path('/', .as_view()),
+   path('/join', JoinView.as_view())
    #path('/', .as_view())
 
    

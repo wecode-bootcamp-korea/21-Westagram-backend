@@ -14,12 +14,12 @@ class NewUserView(View):
             user = User(
                 email        = data.get('email'), 
                 password     = data['password'], 
-                phone_number = data['phone_number'], 
-                nickname     = data['nickname']
+                phone_number = data.get('phone_number'), 
+                nickname     = data.get('nickname')
             )
 
             user.phone_number = user.check_blank(user.phone_number)
-            user.nickname = user.check_blank(user.nickname)
+            user.nickname     = user.check_blank(user.nickname)
 
             user.full_clean()
             user.save()

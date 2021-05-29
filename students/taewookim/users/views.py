@@ -17,8 +17,8 @@ class UserView(View):
             data         = json.loads(request.body)
             email        = data['email']
             password     = data['password']
-            nickname     = data.get('nickname')
-            phone_number = data.get('phone_number')
+            nickname     = data['nickname'] 
+            phone_number = data['phone_number']
 
             if not re.match(EMAIL_REGEX, email):
                 return JsonResponse({"result": "INVALIED_EMAIL"}, status=400)
@@ -26,22 +26,20 @@ class UserView(View):
             if not re.match(PASSWORD_REGEX, password):
                 return JsonResponse({"result": "INVALIED_PASSWORD"}, status=400)
 
+            if not re.match(NICKNAME_REGEX, nickname):
+                return JsonResponse({"result": "INVALIED_NICKNAME"}, status=400)
+
+            if not re.match(PHONE_REGEX, phone_number):
+                return JsonResponse({"result": "INVALIED_PHONE_NUMBER"}, status=400)
+
             if User.objects.filter(email=email).exists() :
                 return JsonResponse({"result": "DUPLICATED_EMAIL"}, status=409)
 
-            if nickname is not None:
-                if not re.match(NICKNAME_REGEX, nickname):
-                    return JsonResponse({"result": "INVALIED_NICKNAME"}, status=400)
+            if User.objects.filter(nickname=nickname).exists() :
+                return JsonResponse({"result": "DUPLICATED_NICKNAME"}, status=409)
 
-                if User.objects.filter(nickname=nickname).exists() :
-                    return JsonResponse({"result": "DUPLICATED_NICKNAME"}, status=409)
-
-            if phone_number is not None:
-                if not re.match(PHONE_REGEX, phone_number):
-                    return JsonResponse({"result": "INVALIED_PHONE_NUMBER"}, status=400)
-
-                if User.objects.filter(phone_number=phone_number).exists() :
-                    return JsonResponse({"result": "DUPLICATED_PHONE_NUMBER"}, status=409)
+            if User.objects.filter(phone_number=phone_number).exists() :
+                return JsonResponse({"result": "DUPLICATED_PHONE_NUMBER"}, status=409)
                 
             User.objects.create(
                 email        = email,

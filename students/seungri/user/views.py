@@ -16,10 +16,11 @@ class UserJoinIn(View):
             phone_num = data["phone_num"]
             nick_name = data["nick_name"]
             
-            email_regex = '^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+            email_regex = re.compile('^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
 
-            if re.compile(email_regex).match(email) == None:
-                return JsonResponse({"message": "EMAIL_FORM_ERROR"}, status=400)
+            if not email_regex.match(email):
+                return JsonResponse({"message": "EMAIL_FORM_ERROR"}, status =  400)
+
             if len(password) < 8 or len(password) > 15:
                 return JsonResponse({"message": "PASSWORD_ERROR"}, status=400)
 
@@ -27,7 +28,7 @@ class UserJoinIn(View):
                                 password  = password,
                                 phone_num = phone_num,
                                 nick_name = nick_name)
-            return JsonResponse({"message": "SUCCESS!"}, status=201)
+            return JsonResponse({"message": "SUCCESS!"}, status=200)
         except KeyError:
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
         except IntegrityError:

@@ -32,10 +32,11 @@ class SignupView(View):
             
             if not re.search(password_regex, password):
                 return JsonResponse({'message': '패스워드 형식이 아닙니다.'}, status= 400)
-    
+              
             if User.objects.filter(
                 Q(nickname = nickname) | Q(phone_number = phone_number) | Q(email = email)):
-                return JsonResponse({'message': '입력된 정보가 중복되었습니다.'}, status= 409)
+                
+                return JsonResponse({'message': '입력값이 중복되었습니다.'}, status= 409)
             
             User.objects.create(
                 nickname     = nickname,
@@ -49,6 +50,3 @@ class SignupView(View):
         except KeyError:
             return JsonResponse({'message': 'KEY_ERROR'}, status= 400)
         
-        
-
-            

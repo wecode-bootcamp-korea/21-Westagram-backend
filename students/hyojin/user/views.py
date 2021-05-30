@@ -20,7 +20,7 @@ class NewUserView(View):
 
             user.phone_number = user.check_blank(user.phone_number)
             user.nickname     = user.check_blank(user.nickname)
-
+            
             user.full_clean()
             user.save()
 
@@ -30,6 +30,8 @@ class NewUserView(View):
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
 
         except ValidationError as e: 
-            return JsonResponse({'message':e.message_dict}, status=500)
+            return JsonResponse({'message':e.message_dict}, status=400)
 
-   
+        
+
+      

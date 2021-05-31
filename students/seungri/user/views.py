@@ -4,7 +4,6 @@ import re
 from django.views import View
 from django.http  import JsonResponse
 from django.db    import IntegrityError
-from django.core.exceptions import ObjectDoesNotExist
 
 from .models import User
 
@@ -37,17 +36,3 @@ class UserJoinIn(View):
         except IntegrityError:
             return JsonResponse({"message": "DUPLICATE_ENTRY_KEY_ERROR"}, status=400)
 
-class UserLogIn(View):
-    def post(self, request):
-        try:
-            data      = json.loads(request.body)
-            email     = data["email"]
-            password  = data["password"]
-
-            if email == "" or password == "":
-                return JsonResponse({"message": "KEY_ERROR"}, status=400)
-            elif User.objects.get(email=email, password=password):
-                return JsonResponse({"message": "SUCCESS!"}, status=200)
-
-        except ObjectDoesNotExist:
-            return JsonResponse({"message": "INVALID_USER"}, status=401)

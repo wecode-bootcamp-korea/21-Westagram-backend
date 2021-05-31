@@ -32,5 +32,3 @@ class NewUserView(View):
         except ValidationError as e: 
             return JsonResponse({'message':e.message_dict}, status=400)
 
-
-      

@@ -1,8 +1,10 @@
 import json
+from django.db.models.fields import IntegerField
 
 from django.views           import View
 from django.http            import JsonResponse
 from django.core.exceptions import ValidationError
+from django.db              import IntegrityError
 
 from .models import User
 
@@ -12,8 +14,8 @@ class NewUserView(View):
             data = json.loads(request.body)
 
             user = User(
-                email        = data.get('email'), 
-                password     = data.get('password'), 
+                email        = data['email'], 
+                password     = data['password'], 
                 phone_number = data.get('phone_number'), 
                 nickname     = data.get('nickname')
             )
@@ -29,6 +31,10 @@ class NewUserView(View):
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
 
+        except IntegrityError:
+            return JsonResponse({"message":"이미 존재하는 값 입니다."}, status=400)
+
         except ValidationError as e: 
             return JsonResponse({'message':e.message_dict}, status=400)
 
+       

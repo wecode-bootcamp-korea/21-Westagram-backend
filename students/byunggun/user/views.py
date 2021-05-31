@@ -69,10 +69,10 @@ class SignIn(View):
                 token = jwt.encode({'email':sign_datas['email']}, SECRET_KEY, algorithm='HS256')
                 return JsonResponse({'token': token}, status=200)
             else:
-                return JsonResponse({'result':'INVALID_PASSWORD'}, status=400)
+                return JsonResponse({'result':'INVALID_PASSWORD'}, status=401)
 
         except User.DoesNotExist:
-            return JsonResponse({'result':'NOT_EXIST_EMAIL'}, status=400)
+            return JsonResponse({'result':'NOT_EXIST_EMAIL'}, status=401)
         except KeyError:
             return JsonResponse({'result':'INVALID_KEY'}, status=400)
         except json.decoder.JSONDecodeError:

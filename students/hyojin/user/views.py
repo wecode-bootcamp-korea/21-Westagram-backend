@@ -17,8 +17,6 @@ class NewUserView(View):
                 phone_number = data.get('phone_number'), 
                 nickname     = data.get('nickname')
             )
-            print(user.email)
-            print(user.password)
 
             user.phone_number = user.check_blank(user.phone_number)
             user.nickname     = user.check_blank(user.nickname)

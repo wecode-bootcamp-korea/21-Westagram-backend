@@ -19,11 +19,11 @@ class UserView(View):
             
              if len(data['password']) <PASSWORD:
                 return JsonResponse({'MESSAGE':'PASS_KEY_ERROR'},status=400)
-                
+
              if User.objects.filter(
-                Q(email = data['email'])| 
-                Q(nickname = data['nickname'])|
-                Q(phone_number=data['mobile'])):
+                Q(email        = data['email'])| 
+                Q(nickname     = data['nickname'])|
+                Q(phone_number = data['mobile'])):
     
                 return JsonResponse({'MESSAGE':'USER_ALREADY_EXISIS'},status=400)
 

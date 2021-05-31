@@ -1,4 +1,5 @@
 import json
+from django.db.models.fields import IntegerField
 
 from django.views           import View
 from django.http            import JsonResponse
@@ -13,10 +14,12 @@ class NewUserView(View):
 
             user = User(
                 email        = data.get('email'), 
-                password     = data['password'], 
+                password     = data.get('password'), 
                 phone_number = data.get('phone_number'), 
                 nickname     = data.get('nickname')
             )
+            print(user.email)
+            print(user.password)
 
             user.phone_number = user.check_blank(user.phone_number)
             user.nickname     = user.check_blank(user.nickname)
@@ -32,6 +35,5 @@ class NewUserView(View):
         except ValidationError as e: 
             return JsonResponse({'message':e.message_dict}, status=400)
 
-        
 
       

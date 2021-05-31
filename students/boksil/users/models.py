@@ -7,5 +7,5 @@ class User(models.Model):
     nickname = models.CharField(max_length=45, null=True, blank=False) # null=True
     password = models.CharField(max_length=90) 
 
-    class Meta():
+    class Meta:
         db_table = 'users'

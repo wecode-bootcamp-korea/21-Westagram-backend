@@ -1,5 +1,4 @@
 import json
-from django.db.models.fields import IntegerField
 
 from django.views           import View
 from django.http            import JsonResponse

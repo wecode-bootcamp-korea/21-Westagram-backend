@@ -11,4 +11,4 @@ class PostingImage(models.Model):
     url     = models.CharField(max_length=200)
     
     class Meta():
-        db_table = 'posting_imags'
+        db_table = 'posting_images'

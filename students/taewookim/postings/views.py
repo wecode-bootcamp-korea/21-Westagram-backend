@@ -4,7 +4,6 @@ from json.decoder                 import JSONDecodeError
 from django.views                 import View
 from django.http.response         import JsonResponse
 from django.db                    import transaction
-from django.db.models.expressions import F
 
 from users.models                 import User
 from .models                      import Posting, PostingImage
@@ -12,23 +11,27 @@ from .models                      import Posting, PostingImage
 class PosingView(View):
     def post(self, request):
         try:
-            data = json.loads(request)
+            data       = json.loads(request.body)
+            image_urls = data['image_urls']
+
+            if type(image_urls) is not list:
+                return JsonResponse({'message': 'INVALIED_DATA'}, status=400)
 
             with transaction.atomic():
                 new_posting = Posting.objects.create(
-                    user      = User.Objects.get(email=data['email']),
+                    user      = User.objects.get(email=data['email']),
                     main_text = data['main_text']
                     )
 
-                for image_url in data['image_urls']:
+                for image_url in image_urls:
                     PostingImage.objects.create(
                         posting = new_posting,
                         url     = image_url
                         )
 
-            JsonResponse({'message': 'CREATED'}, status=201)
+            return JsonResponse({'message': 'CREATED'}, status=201)
 
-        except ValueError:
+        except KeyError:
             return JsonResponse({'message': 'INVALIED_DATA'}, status=400)
 
         except JSONDecodeError:
@@ -51,4 +54,4 @@ class PosingView(View):
                     .values_list('url', flat=True))
                 })
             
-        JsonResponse({'message': result}, status=200)
+        return JsonResponse({'message': result}, status=200)

@@ -19,8 +19,8 @@ class NewUserView(View):
                 nickname     = data.get('nickname')
             )
 
-            user.phone_number = user.check_blank(user.phone_number)
-            user.nickname     = user.check_blank(user.nickname)
+            user.phone_number = self.check_blank(user.phone_number)
+            user.nickname     = self.check_blank(user.nickname)
             
             user.full_clean()
             user.save()

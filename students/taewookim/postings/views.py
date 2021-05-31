@@ -17,7 +17,6 @@ class PosingView(View):
             with transaction.atomic():
                 new_posting = Posting.objects.create(
                     user      = User.Objects.get(email=data['email']),
-                    title     = data['title'],
                     main_text = data['main_text']
                     )
 
@@ -44,8 +43,9 @@ class PosingView(View):
 
         for posting in postings:
             result.append({
-                'name'       : posting.user.name,
-                'age'        : posting.age,
+                'user'       : posting.user.email,
+                'main_text'  : posting.main_text,
+                'created_at' : posting.created_at,
                 'image_urls' : list(
                     posting.postingimage_set.all()
                     .values_list('url', flat=True))

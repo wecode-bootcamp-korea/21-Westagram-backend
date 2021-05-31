@@ -3,7 +3,6 @@ from django.db.models.fields.related import ForeignKey
 
 class Posting(models.Model):
     user       = ForeignKey('users.user', on_delete=models.CASCADE)
-    title      = models.fields.CharField(max_length=120)
     main_text  = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -27,3 +27,7 @@ def validate_phone(phone_number):
 def validate_nickname(nickname):
     if User.objects.filter(nickname=nickname).exists() and nickname!=None and nickname!='':
         raise ValidationError('NICKNAME EXIST')
+
+
+    
+    

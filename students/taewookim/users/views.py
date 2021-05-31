@@ -4,9 +4,9 @@ from json.decoder            import JSONDecodeError
 from django.views            import View
 from django.http.response    import JsonResponse
 from django.db.models        import Q
-from westagram.settings      import SECRET_KEY, HASH_ALGORITHM
 
 from .models                 import User
+from westagram.settings      import SECRET_KEY, HASH_ALGORITHM
 
 EMAIL_REGEX    = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,50}$'
 PASSWORD_REGEX = '^.{8,30}$'

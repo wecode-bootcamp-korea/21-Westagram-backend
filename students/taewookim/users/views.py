@@ -1,16 +1,26 @@
-import json, re
-from json.decoder           import JSONDecodeError
+import json, re, bcrypt, jwt
+from json.decoder            import JSONDecodeError
 
-from django.views           import View
-from django.http.response   import JsonResponse
-from django.db.models       import Q
+from django.views            import View
+from django.http.response    import JsonResponse
+from django.db.models        import Q
+from westagram.settings      import SECRET_KEY, HASH_ALGORITHM
 
-from .models                import User
+from .models                 import User
 
 EMAIL_REGEX    = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,50}$'
 PASSWORD_REGEX = '^.{8,30}$'
 NICKNAME_REGEX = '^.{2,10}$'
 PHONE_REGEX    = '^01[016789]\-\d{3,4}\-\d{4}$'
+
+def encrypt_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+def check_password(password, hashed_password):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
+
+def make_user_token(id):
+    return jwt.encode({'user_id': id}, SECRET_KEY, algorithm=HASH_ALGORITHM)
 
 class UserView(View):
     def post(self, request):
@@ -53,3 +63,27 @@ class UserView(View):
 
         except KeyError:
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
+
+class LoginView(View):
+    def post(self, request):
+        try:
+            data     = json.loads(request.body)
+            email    = data['email']
+            password = data['password']
+            user     = User.objects.get(email=email)
+
+            if not check_password(password, user.password):
+                return JsonResponse({"message": "INVALID_USER"}, status=401)    
+                
+            user_token = make_user_token(user.id)
+
+            return JsonResponse({"message": "SUCCESS", "token": user_token}, status=200)
+        
+        except User.DoesNotExist:
+            return JsonResponse({"message": "INVALID_USER"}, status=401)            
+        
+        except JSONDecodeError:
+            return JsonResponse({"message": "EMPTY_BODY_DATA"}, status=400)
+
+        except KeyError:
+            return JsonResponse({"result": "KEY_ERROR"}, status=400)

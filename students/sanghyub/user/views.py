@@ -18,34 +18,31 @@ class UserSignUp(View) :
     def post(self,request):
         try:
             data = json.loads(request.body)
-            email1        = data["email"]
-            password1     = data["password"]
-            nickname1     = data["nickname"]
-            phone_number1 = data["phone_number"]
+            email        = data["email"]
+            password     = data["password"]
+            nickname     = data["nickname"]
+            phone_number = data["phone_number"]
 
-
-            if regEXP_email.match(email1) and \
-               regEXP_pw.match(password1) and \
-               regEXP_phone.match(phone_number1):
+            if regEXP_email.match(email) and \
+               regEXP_pw.match(password) and \
+               regEXP_phone.match(phone_number):
                pass
             else:
                  return JsonResponse({"message":"IMPROPER input"}, status = 400)
           
-
             user = User.objects
                      
-            if user.filter(email = email1 ).exists() or \
-               user.filter(nickname = nickname1 ).exists() or \
-               user.filter(phone_number = phone_number1 ).exists():
+            if user.filter(email = email ).exists() or \
+               user.filter(nickname = nickname ).exists() or \
+               user.filter(phone_number = phone_number ).exists():
                  return JsonResponse({"message": "accout_info already exists"},status = 400)
 
             user.create(
-                email        = email1,
-                password     = password1,
-                nickname     = nickname1,
-                phone_number = phone_number1
+                email        = email,
+                password     = password,
+                nickname     = nickname,
+                phone_number = phone_number
             )
-            
             return JsonResponse({"message": "CREATED!"}, status = 201)
         except KeyError:
             return JsonResponse({"message": "INVALID KEY"}, status = 400)

@@ -6,9 +6,9 @@ class Posting(models.Model):
     main_text  = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-class PostingImage(Posting):
+class PostingImage(models.Model):
     posting = ForeignKey(Posting, on_delete=models.CASCADE)
     url     = models.CharField(max_length=200)
     
     class Meta():
-        db_table = 'posting_images'
+        db_table = 'posting_imags'

@@ -9,7 +9,7 @@ from .models import Member
 
 email_regex = "^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
 
-class Sign(View):
+class SignUp(View):
     def post(self, request):
         try:
             data          = json.loads(request.body)
@@ -20,15 +20,16 @@ class Sign(View):
 
             if len(password_data) < 8:
                 return JsonResponse({'message': '비밀번호 8자이상 작성해주세요.'}, status=400)
-            if not(re.search(email_regex, email_data)):
+            if not re.search(email_regex, email_data):
                 return JsonResponse({'message': '이메일 형식에 맞게 작성해주세요.'}, status=400)
-
+            if phone_data =='' or nickname_data =='':
+                return JsonResponse({'message': "KEY_ERROR"}, status=400)
             Member.objects.create(
-                            email    = email_data,
-                            password = password_data,
-                            phone    = phone_data,
-                            nickname = nickname_data
-                            )
+                email    = email_data,
+                password = password_data,
+                phone    = phone_data,
+                nickname = nickname_data
+                )
 
             return JsonResponse({'message': "SUCCESS"}, status=201)
         except KeyError:

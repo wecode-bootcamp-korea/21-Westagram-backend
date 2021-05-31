@@ -3,6 +3,7 @@ from json.decoder           import JSONDecodeError
 
 from django.views           import View
 from django.http.response   import JsonResponse
+from django.db.models       import Q
 
 from .models                import User
 
@@ -32,15 +33,12 @@ class UserView(View):
             if not re.match(PHONE_REGEX, phone_number):
                 return JsonResponse({"result": "INVALIED_PHONE_NUMBER"}, status=400)
 
-            if User.objects.filter(email=email).exists() :
-                return JsonResponse({"result": "DUPLICATED_EMAIL"}, status=409)
+            if User.objects.filter(
+                Q(email=email) | 
+                Q(nickname=nickname) | 
+                Q(phone_number=phone_number)).exists() :
+                return JsonResponse({"result": "DUPLICATED_INFORMATION"}, status=409)
 
-            if User.objects.filter(nickname=nickname).exists() :
-                return JsonResponse({"result": "DUPLICATED_NICKNAME"}, status=409)
-
-            if User.objects.filter(phone_number=phone_number).exists() :
-                return JsonResponse({"result": "DUPLICATED_PHONE_NUMBER"}, status=409)
-                
             User.objects.create(
                 email        = email,
                 password     = password,

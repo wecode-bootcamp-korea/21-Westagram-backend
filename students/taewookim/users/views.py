@@ -22,22 +22,22 @@ class UserView(View):
             phone_number = data['phone_number']
 
             if not re.match(EMAIL_REGEX, email):
-                return JsonResponse({"result": "INVALIED_EMAIL"}, status=400)
+                return JsonResponse({"message": "INVALIED_EMAIL"}, status=400)
 
             if not re.match(PASSWORD_REGEX, password):
-                return JsonResponse({"result": "INVALIED_PASSWORD"}, status=400)
+                return JsonResponse({"message": "INVALIED_PASSWORD"}, status=400)
 
             if not re.match(NICKNAME_REGEX, nickname):
-                return JsonResponse({"result": "INVALIED_NICKNAME"}, status=400)
+                return JsonResponse({"message": "INVALIED_NICKNAME"}, status=400)
 
             if not re.match(PHONE_REGEX, phone_number):
-                return JsonResponse({"result": "INVALIED_PHONE_NUMBER"}, status=400)
+                return JsonResponse({"message": "INVALIED_PHONE_NUMBER"}, status=400)
 
             if User.objects.filter(
                 Q(email=email) | 
                 Q(nickname=nickname) | 
                 Q(phone_number=phone_number)).exists() :
-                return JsonResponse({"result": "DUPLICATED_INFORMATION"}, status=409)
+                return JsonResponse({"message": "DUPLICATED_INFORMATION"}, status=409)
 
             User.objects.create(
                 email        = email,
@@ -46,10 +46,10 @@ class UserView(View):
                 nickname     = nickname
             )
 
-            return JsonResponse({"result": "CREATED"}, status=201)
+            return JsonResponse({"message": "CREATED"}, status=201)
 
         except JSONDecodeError:
-            return JsonResponse({"result": "EMPTY_BODY_DATA"}, status=400)
+            return JsonResponse({"message": "EMPTY_BODY_DATA"}, status=400)
 
         except KeyError:
-            return JsonResponse({"result": "KEY_ERROR"}, status=400)
+            return JsonResponse({"message": "KEY_ERROR"}, status=400)

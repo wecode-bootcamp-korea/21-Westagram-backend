@@ -1,6 +1,5 @@
-import json
 import jwt
-from jwt.algorithms import Algorithm
+import json
 import bcrypt 
 
 from django.views           import View

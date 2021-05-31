@@ -51,7 +51,7 @@ class UserView(View):
 
             User.objects.create(
                 email        = email,
-                password     = password,
+                password     = encrypt_password(password),
                 phone_number = phone_number,
                 nickname     = nickname
             )
@@ -73,14 +73,13 @@ class LoginView(View):
             user     = User.objects.get(email=email)
 
             if not check_password(password, user.password):
-                return JsonResponse({"message": "INVALID_USER"}, status=401)    
-                
-            user_token = make_user_token(user.id)
+                return JsonResponse({"message": "INVALID_USER"}, status=401)
 
-            return JsonResponse({"message": "SUCCESS", "token": user_token}, status=200)
-        
+            return JsonResponse({"message": "SUCCESS",
+                                 "token"  : make_user_token(user.id)}, status=200)
+
         except User.DoesNotExist:
-            return JsonResponse({"message": "INVALID_USER"}, status=401)            
+            return JsonResponse({"message": "INVALID_USER"}, status=401)
         
         except JSONDecodeError:
             return JsonResponse({"message": "EMPTY_BODY_DATA"}, status=400)

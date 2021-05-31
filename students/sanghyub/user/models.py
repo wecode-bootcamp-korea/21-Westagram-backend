@@ -4,10 +4,10 @@ from django.db              import models
 
 
 class User(models.Model):
-    email        = models.EmailField(max_length= 80, null = False, unique = True)
-    password     = models.CharField(max_length = 30, null = False, unique = True)
-    nickname     = models.CharField(max_length = 30)
-    phone_number = models.CharField(max_length = 13) # 010 -0000-0000 try applying 
+    email        = models.EmailField(max_length = 80, null = False, unique = True)
+    password     = models.CharField(max_length = 100, null = False)
+    nickname     = models.CharField(max_length = 30, unique = True)
+    phone_number = models.CharField(max_length = 13, unique = True) # 010 -0000-0000 try applying 
 
     class Meta:
         db_table = 'users'

@@ -79,6 +79,11 @@ class UserSignIn(View) :
         except exceptions.ObjectDoesNotExist:
             return JsonResponse({"message":"INVALID_USER"}, status = 404)
 
+    class UserPost(View):
+        def post(self,request):
+            data = json.loads(request.body)
+
+
 
 
        

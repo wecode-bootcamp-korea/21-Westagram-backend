@@ -1,11 +1,14 @@
 import json
 import re
+import bcrypt
+import jwt
 
 from django.views import View
 from django.http import JsonResponse
 from django.db.models import Q
 from django.db import utils
 from .models import User
+from my_settings import SECRET_KEY, ALGORITHM
 
 class SignUpView(View):
     def post(self, request):
@@ -13,8 +16,10 @@ class SignUpView(View):
             data      = json.loads(request.body)
             email     = data['email']
             password  = data['password']
-            phone_num = data.get('phone_num')
-            name      = data.get('name')
+            phone_num = data['phone_num']
+            name      = data['name']
+            en_pw     = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
 
             email_regex    = '^([\w\.\-_]+)?\w+@[\w]+(\.\w+){1,}$'
             password_regex = '^([a-zA-Z0-9~!@#$%^&*()_+]).{7,}$'
@@ -32,7 +37,7 @@ class SignUpView(View):
                 name      = name, 
                 email     = email,
                 phone_num = phone_num,
-                password  = password
+                password  = en_pw.decode('utf-8')
             )
 
             return JsonResponse({"result":"SUCCESS"}, status = 201)
@@ -42,3 +47,30 @@ class SignUpView(View):
 
         except utils.IntegrityError:
             return JsonResponse({"message":"DUPLICATE_VALUE"}, status = 409)
+
+class SignInView(View):
+    def post(self, request):
+        try:
+            data       = json.loads(request.body)
+            email      = data['email']
+            password   = data['password']
+            email_dic  = {"email":email}
+            byte_pass  = password.encode('utf-8')
+            db_pass    = User.objects.get(email=data['email']).password
+            en_db_pass = db_pass.encode('utf-8')
+
+            if not email or not password:
+                return JsonResponse({"message":"KEY_ERROR"}, status = 400)
+            
+            if not bcrypt.checkpw(byte_pass,en_db_pass):
+                return JsonResponse({"message":"INVALID_USER"}, status = 401)
+
+            token = jwt.encode(email_dic, SECRET_KEY, ALGORITHM)
+
+            return JsonResponse({"Token":token}, status = 201)
+
+        except KeyError:
+            return JsonResponse({"message":"KEY_ERROR"}, status = 400)
+        
+        except User.DoesNotExist:
+            return JsonResponse({"message":"INVALID_USER"}, status = 401)

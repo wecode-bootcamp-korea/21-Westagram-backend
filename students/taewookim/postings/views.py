@@ -48,7 +48,7 @@ class PosingView(View):
             result.append({
                 'user'       : posting.user.email,
                 'main_text'  : posting.main_text,
-                'created_at' : posting.created_at,
+                'created_at' : posting.created_at.strftime('%Y-%m-%d %H:%M:%S'),
                 'image_urls' : list(
                     posting.postingimage_set.all()
                     .values_list('url', flat=True))

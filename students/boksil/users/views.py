@@ -4,15 +4,15 @@ from django.views import View
 from django.http  import JsonResponse
 from django.db    import IntegrityError
 
-from .models import User
+from .models            import User
+from westagram.settings import SECRET_KEY, ALGORITHM
 
 email_regex = re.compile('^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
 
 class SignupView(View):
     def post(self, request):
         try:
-            data = json.loads(request.body)
-
+            data            = json.loads(request.body)
             bcrypt_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
             if User.objects.filter(mobile=data['mobile']).exists():
@@ -53,14 +53,18 @@ class SigninView(View):
             if input_email == '' or input_password == '':
                 return JsonResponse({'message': 'INVALID_USER'}, status=401)
 
-            db_email = User.objects.get(email=input_email)
+            db_email    = User.objects.get(email=input_email)
             db_password = db_email.password # 가져온 이메일의 패스워드
             db_password = db_password.encode('utf-8') # 패스워드를 다시 encode
 
             if not bcrypt.checkpw(input_password, db_password):
                 return JsonResponse({'message': 'INVALID_USER'}, status=401)
+            
+            user      = {'user_id': db_email.id}
+            token     = jwt.encode(user, SECRET_KEY, ALGORITHM)
+            token_num = jwt.decode(token, SECRET_KEY, ALGORITHM)
 
-            return JsonResponse({'message': 'SUCCESS'}, status=200)
+            return JsonResponse({'token': token_num, 'message': 'SUCCESS'}, status=200)
 
         except KeyError:
             return JsonResponse({'massage': 'KEY_ERROR'}, status=400)

@@ -1,7 +1,10 @@
 import json
 import re
 import bcrypt
-
+import jwt
+import os
+import sys
+sys.path.append(os.path.dirname('/Users/mac/Desktop/wecode_dev/21-Westagram-backend/students/sanghyub/21-Westagram-backend/students/sanghyub'))
 
 from django.db.models.fields import EmailField
 from django.views import View
@@ -9,10 +12,15 @@ from django.http  import JsonResponse, HttpResponse
 from django.core  import exceptions, validators
 
 from .models      import User
+from .utils       import jwt_token_decorator
+from sanghyub.my_settings import SECRET_KEY
 
 regEXP_email = re.compile(r'^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
 regEXP_pw    = re.compile(r'[a-zA-Z0-9+-_.]{8,}')
 regEXP_phone = re.compile(r'\d{2,3}-\d{3,4}-\d{4}')
+
+SECRET = SECRET_KEY
+
 
 class UserSignUp(View) : 
     def post(self,request):
@@ -48,6 +56,28 @@ class UserSignUp(View) :
             return JsonResponse({"message": "CREATED!"}, status = 201)
         except KeyError:
             return JsonResponse({"message": "INVALID KEY"}, status = 400)
+
+
+class UserSignIn(View) : 
+    def post(self,request):
+        try:
+            data        = json.loads(request.body)
+            signin_user = User.objects.get(email = data["email"])
+        
+            if bcrypt.checkpw(data['password'].encode("utf-8"),
+                              signin_user.password.encode('utf-8')):            
+                access_token = jwt.encode({'id':signin_user.id},
+                                            SECRET,
+                                            algorithm = 'HS256')
+                user_info = [{"token":access_token}]
+                return JsonResponse({"message": user_info}, status = 200)  
+            else:
+                return JsonResponse({"message":"INVALID_USER"}, status = 400)
+
+        except KeyError:
+            return JsonResponse({"message": "INVALID_KEY"},status = 400)
+        except exceptions.ObjectDoesNotExist:
+            return JsonResponse({"message":"INVALID_USER"}, status = 404)
 
 
 

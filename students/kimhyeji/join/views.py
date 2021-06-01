@@ -1,5 +1,5 @@
 import json
-import bcrypt
+import re
 
 from django.http      import JsonResponse
 from django.views     import View
@@ -21,10 +21,8 @@ class UserView(View):
             if User.objects.filter(email=data['email']).exist():
                 return JsonResponse({'message':'중복되었습니다.'}, status=400)
 
-            # if len(data['password']) < 8 :
-            #     return JsonResponse({"message":"8자리이상입력하세요."}, status=400)
-            password = data['password']
-            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            if len(data['password']) < 8 :
+                return JsonResponse({"message":"8자리이상입력하세요."}, status=400)
    
             User.objects.create(
                     email        = data['email'],

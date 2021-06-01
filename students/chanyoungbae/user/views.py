@@ -3,11 +3,12 @@ import re
 import bcrypt
 import jwt
 
-from django.views import View
-from django.http import JsonResponse
+from django.views     import View
+from django.http      import JsonResponse
 from django.db.models import Q
-from django.db import utils
-from .models import User
+from django.db        import utils
+
+from .models     import User
 from my_settings import SECRET_KEY, ALGORITHM
 
 class SignUpView(View):

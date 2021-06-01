@@ -5,7 +5,7 @@ from .views import LoginView
 # from .views import LoginView
 
 urlpatterns = [
-    path('/sign', SignupView.as_view()),
-    path('/login', LoginView.as_view())
+    path('sign', SignupView.as_view()),
+    path('login', LoginView.as_view())
     
 ]

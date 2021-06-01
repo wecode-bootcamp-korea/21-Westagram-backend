@@ -21,9 +21,9 @@ class UserSignupView(View):
             
             #uniqueness check(account,phone_number,nickname)
             if User.objects.filter(
-                Q(account      =data['account'])|
-                Q(phone_number =data['phone_number'])|
-                Q(nickname     =data.get('nickname'))).exists():
+                Q(account      = data['account'])|
+                Q(phone_number = data['phone_number'])|
+                Q(nickname     = data.get('nickname'))).exists():
                 return JsonResponse({'message': 'ACCOUNT or PHONE NUMBER or NICK NAME ALEADY EXISTS'}, status=400)
 
             # account validation
@@ -36,8 +36,8 @@ class UserSignupView(View):
             
             # password encrypt
             password_encoded = data['password'].encode('utf-8')
-            salt = bcrypt.gensalt()
-            password_hashed = bcrypt.hashpw(password_encoded, salt)
+            salt             = bcrypt.gensalt()
+            password_hashed  = bcrypt.hashpw(password_encoded, salt)
             password_decoded = password_hashed.decode('utf-8')
 
             # phone_number validation & harmonization(make consistent)
@@ -46,7 +46,7 @@ class UserSignupView(View):
 
             # nickname blank check
             if len(data['nickname']) == 0:
-                raise IntegrityError
+                return JsonResponse({'message':'INPUT ERROR'}, status=400)
 
             # POST
             User.objects.create(
@@ -76,7 +76,8 @@ class UserSigninView(View):
                 return JsonResponse({'message':'INVALID USER'}, status=401)
 
             payload = {'account': user.account}
-            token = jwt.encode(payload, SECRET_KEY, ALGORYTHM)            
+            token   = jwt.encode(payload, SECRET_KEY, ALGORYTHM)
+
             return JsonResponse({'message':'SUCCESS','token':token}, status=200)
 
         except User.DoesNotExist:

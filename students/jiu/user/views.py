@@ -52,6 +52,29 @@ class NewUserView(View) :
         except KeyError :
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
 
+
+class LoginView(View) :
+
+    def post(self, request) :
+
+        try :
+            data = json.loads(request.body)
+            email_set = User.objects.get(email=data['email'])
+            
+            if User.objects.filter(email=data['email']).exists() :
+                if email_set.password == data['password'] :
+                    return JsonResponse({'message':'SUCCESS'}, status=200)
+                elif email_set.password != data['password'] :
+                    return JsonResponse({'message':'INVALID_USER1'}, status=401)
+            
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
+
+        except User.DoesNotExist:
+            return JsonResponse({'message':'INVALID_USER2'}, status=401)
+        
+     
+
         
 
         

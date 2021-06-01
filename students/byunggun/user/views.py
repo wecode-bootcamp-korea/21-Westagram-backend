@@ -8,7 +8,7 @@ from django.http      import JsonResponse
 from django.db.models import Q
 
 from .models     import User
-from my_settings import SECRET_KEY
+from my_settings import SECRET_KEY, ALGORITHM
 
 class UserView(View):
     def post(self, request):
@@ -69,7 +69,7 @@ class SignIn(View):
                 sign_datas['password'].encode('utf-8'), 
                 user_data.password.encode('utf-8')
             ):
-                token = jwt.encode({'email':sign_datas['email']}, SECRET_KEY, algorithm='HS256')
+                token = jwt.encode({'email':sign_datas['email']}, SECRET_KEY, algorithm=ALGORITHM)
                 return JsonResponse({'token': token}, status=200)
             else:
                 return JsonResponse({'result':'INVALID_PASSWORD'}, status=401)

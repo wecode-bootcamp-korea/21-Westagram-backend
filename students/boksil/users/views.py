@@ -1,4 +1,4 @@
-import json, re
+import json, re, jwt, bcrypt
 
 from django.views import View
 from django.http  import JsonResponse
@@ -12,6 +12,7 @@ class SignupView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
+            bcrypt_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
 
             if User.objects.filter(mobile=data['mobile']).exists():
                 return JsonResponse({'massage': 'KEY_ERROR_MOBILE_EXIST'}, status=400)
@@ -27,7 +28,7 @@ class SignupView(View):
 
             User.objects.create(
                 email    = data['email'],
-                password = data['password'],
+                password = bcrypt_password,
                 mobile   = data['mobile'],
                 nickname = data['nickname']
             )
@@ -39,3 +40,5 @@ class SignupView(View):
         
         except IntegrityError:
             return JsonResponse({'massage': 'KEY_ERROR_EMAIL_EXIST'}, status=400)
+
+

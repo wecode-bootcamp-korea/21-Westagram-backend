@@ -1,21 +1,24 @@
 import re
 import json
+import jwt
 import bcrypt
 
-from django.views import View
-from django.http  import JsonResponse, request
+from django.views       import View
+from django.http        import JsonResponse, request
 from django.db.models   import Q 
 
-from .models import User
+from .models            import User
+from my_settings        import SECRET_KEY,ALGORITHM
+
 
 
 class UserView(View):
     def post(self,request):
         try:
              data     = json.loads(request.body)
-             mail     ='^[a-z0-9]+[\._]?[]+[@]\w+[.]\w{2,3}$'
+             MAIL     ='^[a-z0-9]+[\._]?[]+[@]\w+[.]\w{2,3}$'
              PASSWORD = 8
-             if not re.search(mail, data['email']):
+             if not re.search(MAIL, data['email']):
                  return JsonResponse({'MESSAGE':'EMAIL_KEY_ERROR'},status=400)
             
              if len(data['password']) <PASSWORD:
@@ -31,7 +34,7 @@ class UserView(View):
             #  hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'),bcrypt.gensalt()).decode()
              User.objects.create(
                 nickname       = data['nickname'],
-                password       = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
+                password       = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()),
                 email          = data['email'],
                 phone_number   = data['mobile'])
             
@@ -47,7 +50,7 @@ class UserView(View):
 class LogView(View):
     def post(self,request):
         try:
-            data = json.loads(request.body)
+            data       = json.loads(request.body)
             if not User.objects.filter(
             Q(email    = data['email'])|
             Q(password = data['password'])).exists():
@@ -57,12 +60,11 @@ class LogView(View):
 
             if User.objects.filter(email=data['email']):
                 if bcrypt.checkpw(data['password'].encode('utf-8'), user_id.password.encode('utf-8')):
-                    return JsonResponse({'message':'성공했다'}, status=200)
-                        
+                    a= jwt.encode({'email':data['email']},SECRET_KEY,ALGORITHM)
+                    return JsonResponse({'message':'성공했다','Token':a}, status=200)
+
         except KeyError :
             return JsonResponse({"message": "KEY_ERROR"}, status=400 )
 
 
 
-
-# http POST localhost:8000/userapp/user nickname='도곡동노' password='q' email='chsk@naver.com' mobile='010-563-2354'

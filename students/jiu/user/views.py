@@ -1,11 +1,15 @@
 import json
 import re
+import bcrypt
+import jwt
 
 from django.views     import View
 from django.http      import JsonResponse
 from django.db.models import Q
 
 from .models          import User
+from my_settings      import SECRET_KEY, ALGORITHM
+
 
 
 class NewUserView(View) :
@@ -38,12 +42,12 @@ class NewUserView(View) :
             # phone_number (len == 11(3,4,4))
             if not re.match(re_phone_number, data['phone_number'])  :
                 return JsonResponse({'message':'PHONE_NUMBER_ERROR'}, status=400) 
-
+            
             # create
             User.objects.create(
                 nickname    =data['nickname'],
                 email       =data['email'],
-                password    =data['password'],
+                password    =bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
                 phone_number=data['phone_number']
                 )
             return JsonResponse({'message':'SUCCESS'}, status=201)
@@ -55,16 +59,20 @@ class NewUserView(View) :
 
 class LoginView(View) :
 
+
     def post(self, request) :
 
         try :
-            data = json.loads(request.body)
-            email_set = User.objects.get(email=data['email'])
+            data         = json.loads(request.body)
+            email_set    = User.objects.get(email=data['email'])
+            access_token = jwt.encode({'email':data['email']}, SECRET_KEY, ALGORITHM)
             
             if User.objects.filter(email=data['email']).exists() :
-                if email_set.password == data['password'] :
-                    return JsonResponse({'message':'SUCCESS'}, status=200)
-                elif email_set.password != data['password'] :
+
+                if bcrypt.checkpw(data['password'].encode('utf-8'), email_set.password.encode('utf-8')) :
+                    return JsonResponse({'token':access_token,'message':'SUCCESS'}, status=200)
+
+                elif not bcrypt.checkpw(data['password'].encode('utf-8'), email_set.password.encode('utf-8')) :
                     return JsonResponse({'message':'INVALID_USER1'}, status=401)
             
         except KeyError:
@@ -72,8 +80,11 @@ class LoginView(View) :
 
         except User.DoesNotExist:
             return JsonResponse({'message':'INVALID_USER2'}, status=401)
+
         
-     
+        
+
+
 
         
 

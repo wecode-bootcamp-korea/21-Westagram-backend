@@ -12,7 +12,6 @@ from django.http  import JsonResponse, HttpResponse
 from django.core  import exceptions, validators
 
 from .models      import User
-from .utils       import jwt_token_decorator
 from sanghyub.my_settings import SECRET_KEY
 
 regEXP_email = re.compile(r'^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
@@ -82,6 +81,7 @@ class UserSignIn(View) :
     class UserPost(View):
         def post(self,request):
             data = json.loads(request.body)
+
 
 
 

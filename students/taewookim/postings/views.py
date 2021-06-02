@@ -59,14 +59,31 @@ class PostingView(View):
         result   = []
 
         for posting in postings:
-            result.append({
+            result.append(self.make_posting_response_data(posting))
+            
+        return JsonResponse({'message': result}, status=200)
+    
+    def get(self, request, id):
+        try:
+            posting = Posting.objects.get(id=id)
+            result = self.make_posting_response_data(posting)
+            
+            return JsonResponse({'message': result}, status=200)
+
+        except Posting.DoesNotExist:
+            return JsonResponse({'message': 'NOT_FOUND'}, status=404)
+
+        except Posting.MultipleObjectsReturned:
+            return JsonResponse({'message': 'NOT_FOUND'}, status=404)
+
+
+    def make_posting_response_data(self, posting):
+        return {
                 'user'       : posting.user.email,
                 'main_text'  : posting.main_text,
                 'created_at' : posting.created_at
-                               .strftime('%Y-%m-%d %H:%M:%S %z %Z'),
+                                .strftime('%Y-%m-%d %H:%M:%S %z %Z'),
                 'image_urls' : list(
                     posting.postingimage_set.all()
                     .values_list('url', flat=True))
-                })
-            
-        return JsonResponse({'message': result}, status=200)
+                }

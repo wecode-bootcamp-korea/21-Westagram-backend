@@ -12,7 +12,7 @@ def decorator(func):
     def wrapper(self, request):
         token = request.META.get('HTTP_AUTHORIZATION')
         user  = jwt.decode(token, SECRET_KEY, ALGORITHM)
-        
+
         return func(self, request, user)
 
     return wrapper
@@ -32,8 +32,10 @@ class PostUploadView(View):
                 user    = user_object,
                 content = content
             )
-      
+
             post.save()
+            print("*************")
+            print(post.created_time)
 
             if image_urls != None:
                 for url in image_urls:

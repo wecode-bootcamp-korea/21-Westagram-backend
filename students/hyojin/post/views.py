@@ -1,5 +1,4 @@
 import json
-from my_settings import ALGORITHM, SECRET_KEY
 import jwt
 
 from django.views import View
@@ -7,6 +6,7 @@ from django.http  import JsonResponse
 
 from .models     import Post, Image
 from user.models import User
+from my_settings import ALGORITHM, SECRET_KEY
 
 def decorator(func):
     def wrapper(self, request):
@@ -34,9 +34,7 @@ class PostUploadView(View):
             )
 
             post.save()
-            print("*************")
-            print(post.created_time)
-
+    
             if image_urls != None:
                 for url in image_urls:
                     image_object = Image(post = post, url = url)

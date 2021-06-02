@@ -1,11 +1,12 @@
-import json, re
-from json.decoder           import JSONDecodeError
+import json, re, bcrypt, jwt
+from json.decoder            import JSONDecodeError
 
-from django.views           import View
-from django.http.response   import JsonResponse
-from django.db.models       import Q
+from django.views            import View
+from django.http.response    import JsonResponse
+from django.db.models        import Q
 
-from .models                import User
+from .models                 import User
+from westagram.settings      import SECRET_KEY, HASH_ALGORITHM
 
 EMAIL_REGEX    = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,50}$'
 PASSWORD_REGEX = '^.{8,30}$'
@@ -41,7 +42,8 @@ class UserView(View):
 
             User.objects.create(
                 email        = email,
-                password     = password,
+                password     = bcrypt.hashpw(password.encode('utf-8'),
+                                             bcrypt.gensalt()).decode('utf-8'),
                 phone_number = phone_number,
                 nickname     = nickname
             )
@@ -53,3 +55,34 @@ class UserView(View):
 
         except KeyError:
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
+
+class LoginView(View):
+    def post(self, request):
+        try:
+            data     = json.loads(request.body)
+            email    = data['email']
+            password = data['password']
+            user     = User.objects.get(email=email)
+
+            if not bcrypt.checkpw(password.encode('utf-8'),
+                                  user.password.encode('utf-8')):
+                return JsonResponse({"message": "INVALID_USER"}, status=401)
+
+            return JsonResponse({
+                                 "message": "SUCCESS",
+                                 "token"  : jwt.encode({'user_id': user.id}, 
+                                                        SECRET_KEY, 
+                                                        algorithm=HASH_ALGORITHM)
+                                }, status=200)
+
+        except User.DoesNotExist:
+            return JsonResponse({"message": "INVALID_USER"}, status=401)
+        
+        except User.MultipleObjectsReturned:
+            return JsonResponse({"message": "INVALID_USER"}, status=401)    
+        
+        except JSONDecodeError:
+            return JsonResponse({"message": "EMPTY_BODY_DATA"}, status=400)
+
+        except KeyError:
+            return JsonResponse({"result": "KEY_ERROR"}, status=400)

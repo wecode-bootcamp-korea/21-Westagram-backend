@@ -25,8 +25,8 @@ class NewUserView(View) :
 
             # nickname, email, phone_number 중복 error
             if User.objects.filter(
-                Q(nickname    =data['nickname']) or
-                Q(email       =data['email'])    or
+                Q(nickname    =data['nickname']) |
+                Q(email       =data['email'])    |
                 Q(phone_number=data['phone_number'])
             ).exists() :
                 return JsonResponse({'message':'ALREADY_EXISTS'}, status=400)

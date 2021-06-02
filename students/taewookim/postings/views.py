@@ -1,25 +1,30 @@
-import json
+import json, jwt
 from json.decoder                 import JSONDecodeError
 
 from django.views                 import View
 from django.http.response         import JsonResponse
 from django.db                    import transaction
+from django.db.utils              import DataError
 
 from users.models                 import User
 from .models                      import Posting, PostingImage
+from westagram.settings      import SECRET_KEY, HASH_ALGORITHM
 
 class PostingView(View):
     def post(self, request):
         try:
             data       = json.loads(request.body)
+            token      = request.headers['token']
             image_urls = data['image_urls']
+            user_id    = jwt.decode(token, SECRET_KEY, 
+                                    algorithms=HASH_ALGORITHM)['user_id']
 
             if type(image_urls) is not list:
                 return JsonResponse({'message': 'INVALIED_DATA'}, status=400)
 
             with transaction.atomic():
                 new_posting = Posting.objects.create(
-                    user      = User.objects.get(email=data['email']),
+                    user      = User.objects.get(id=user_id),
                     main_text = data['main_text']
                     )
 
@@ -37,13 +42,18 @@ class PostingView(View):
         except JSONDecodeError:
             return JsonResponse({'message': 'NO_BODY_DATA'}, status=400)
 
+        except jwt.exceptions.DecodeError:
+            return JsonResponse({'message': 'INVALIED_TOKEN'}, status=401)
+        
+        except DataError:
+            return JsonResponse({'message': 'INVALIED_DATA'}, status=400)
+
         except User.DoesNotExist:
             return JsonResponse({'message': 'NO_EXIST_USER'}, status=409)
 
     def get(self, request):
         postings = Posting.objects.all()
         result   = []
-        print(request.headers)
 
         for posting in postings:
             result.append({

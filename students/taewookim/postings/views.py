@@ -1,13 +1,13 @@
 import json, jwt
-from json.decoder                 import JSONDecodeError
+from json.decoder            import JSONDecodeError
 
-from django.views                 import View
-from django.http.response         import JsonResponse
-from django.db                    import transaction
-from django.db.utils              import DataError
+from django.views            import View
+from django.http.response    import JsonResponse
+from django.db               import transaction
+from django.db.utils         import DataError
 
-from users.models                 import User
-from .models                      import Posting, PostingImage
+from users.models            import User
+from .models                 import Posting, PostingImage
 from westagram.settings      import SECRET_KEY, HASH_ALGORITHM
 
 class PostingView(View):
@@ -75,7 +75,6 @@ class PostingView(View):
 
         except Posting.MultipleObjectsReturned:
             return JsonResponse({'message': 'NOT_FOUND'}, status=404)
-
 
     def make_posting_response_data(self, posting):
         return {

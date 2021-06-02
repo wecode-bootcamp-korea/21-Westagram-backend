@@ -3,6 +3,7 @@ import jwt
 
 from django.views import View
 from django.http  import JsonResponse
+from django.core.exceptions import MultipleObjectsReturned
 
 from .models     import Post, Image
 from user.models import User
@@ -10,10 +11,19 @@ from my_settings import ALGORITHM, SECRET_KEY
 
 def decorator(func):
     def wrapper(self, request):
-        token = request.META.get('HTTP_AUTHORIZATION')
-        user  = jwt.decode(token, SECRET_KEY, ALGORITHM)
+        try:
+            token = request.META.get('HTTP_AUTHORIZATION')
+            user  = jwt.decode(token, SECRET_KEY, ALGORITHM)
 
-        return func(self, request, user)
+            user_object = User.objects.get(id=user['user_id'])
+
+            return func(self, request, user_object)
+
+        except jwt.exceptions.DecodeError:
+            return JsonResponse({'message':'INVALID_TOKEN_TYPE'}, status=400)   
+
+        except User.DoesNotExist:
+            return JsonResponse({'message':'INVALID_USER'}, status=401)
 
     return wrapper
 
@@ -23,13 +33,11 @@ class PostUploadView(View):
         try:
             data = json.loads(request.body)
 
-            user_object = User.objects.get(id=user['user_id'])
-        
             content     = data.get('content')
             image_urls  = data.get('image_urls')
 
             post = Post(
-                user    = user_object,
+                user    = user,
                 content = content
             )
 
@@ -44,6 +52,9 @@ class PostUploadView(View):
             
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=200)
+        
+        except MultipleObjectsReturned:
+            return JsonResponse({'message':"MULTIPLE_KEY_RETURN"}, status=500)
 
 class AllPostView(View):
     def get(self, request):

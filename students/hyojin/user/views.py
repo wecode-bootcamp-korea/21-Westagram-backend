@@ -4,7 +4,7 @@ import bcrypt
 
 from django.views           import View
 from django.http            import JsonResponse
-from django.core.exceptions import ValidationError
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
 
 from .models import User
 from my_settings import SECRET_KEY, ALGORITHM
@@ -69,3 +69,6 @@ class SignInView(View):
         
         except User.DoesNotExist:
             return JsonResponse({'message':'INVALID_USER'}, status=401)
+
+        except MultipleObjectsReturned:
+            return JsonResponse({'message':"Multiple_KEY_RETURN"}, status=500)

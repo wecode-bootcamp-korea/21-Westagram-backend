@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .views      import PosingView
+from .views      import PostingView
 
 urlpatterns = [
-    path('', PosingView.as_view()),
+    path('', PostingView.as_view()),
     ]

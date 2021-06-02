@@ -8,7 +8,7 @@ from django.db                    import transaction
 from users.models                 import User
 from .models                      import Posting, PostingImage
 
-class PosingView(View):
+class PostingView(View):
     def post(self, request):
         try:
             data       = json.loads(request.body)
@@ -43,6 +43,7 @@ class PosingView(View):
     def get(self, request):
         postings = Posting.objects.all()
         result   = []
+        print(request.headers)
 
         for posting in postings:
             result.append({

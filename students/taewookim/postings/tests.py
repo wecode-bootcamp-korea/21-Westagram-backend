@@ -87,7 +87,6 @@ class PostingTest(TestCase):
             )
 
         response = client.get('/postings')
-
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(),
             {

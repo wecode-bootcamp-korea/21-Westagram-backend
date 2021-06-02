@@ -37,9 +37,7 @@ class NewUserView(View):
             return JsonResponse({'message':e.message_dict}, status=400)
 
     def make_hash_value(self, value):
-        result = bcrypt.hashpw(value.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-        return result
+        return bcrypt.hashpw(value.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     def check_blank(self, value):
         if value == "":

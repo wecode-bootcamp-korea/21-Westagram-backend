@@ -1,8 +1,5 @@
-import jwt
-import bcrypt
-import json, re
+import jwt, bcrypt, json, re
 
-from django.http.response import HttpResponse
 from django.views         import View
 from django.http          import JsonResponse
 from django.db.models     import Q

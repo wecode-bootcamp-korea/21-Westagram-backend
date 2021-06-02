@@ -13,15 +13,6 @@ PASSWORD_REGEX = '^.{8,30}$'
 NICKNAME_REGEX = '^.{2,10}$'
 PHONE_REGEX    = '^01[016789]\-\d{3,4}\-\d{4}$'
 
-def encrypt_password(password):
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
-def check_password(password, hashed_password):
-    return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
-
-def make_user_token(id):
-    return jwt.encode({'user_id': id}, SECRET_KEY, algorithm=HASH_ALGORITHM)
-
 class UserView(View):
     def post(self, request):
         try:
@@ -51,7 +42,8 @@ class UserView(View):
 
             User.objects.create(
                 email        = email,
-                password     = encrypt_password(password),
+                password     = bcrypt.hashpw(password.encode('utf-8'),
+                                             bcrypt.gensalt()).decode('utf-8'),
                 phone_number = phone_number,
                 nickname     = nickname
             )
@@ -72,14 +64,22 @@ class LoginView(View):
             password = data['password']
             user     = User.objects.get(email=email)
 
-            if not check_password(password, user.password):
+            if not bcrypt.checkpw(password.encode('utf-8'),
+                                  user.password.encode('utf-8')):
                 return JsonResponse({"message": "INVALID_USER"}, status=401)
 
-            return JsonResponse({"message": "SUCCESS",
-                                 "token"  : make_user_token(user.id)}, status=200)
+            return JsonResponse({
+                                 "message": "SUCCESS",
+                                 "token"  : jwt.encode({'user_id': user.id}, 
+                                                        SECRET_KEY, 
+                                                        algorithm=HASH_ALGORITHM)
+                                }, status=200)
 
         except User.DoesNotExist:
             return JsonResponse({"message": "INVALID_USER"}, status=401)
+        
+        except User.MultipleObjectsReturned:
+            return JsonResponse({"message": "INVALID_USER"}, status=401)    
         
         except JSONDecodeError:
             return JsonResponse({"message": "EMPTY_BODY_DATA"}, status=400)

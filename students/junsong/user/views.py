@@ -56,13 +56,15 @@ class SignIn(View):
             if not re.match(EMAIL_REGEX, email):
                 return JsonResponse({"message": "올바르지 않은 이메일 형식입니다."}, status=400)
             
-            if User.objects.filter(email=email).exists():
-                user = User.objects.get(email=email)
-                if bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
-                    token = jwt.encode({'user_email': email}, SECRET_KEY, algorithm='HS256')
-                    return JsonResponse({"message": "SUCCESS", "token": token}, status=200)
+            user    = User.objects.get(email=email)
+            checkpw = bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8'))
 
-            return JsonResponse({"message": "INVALID_USER"}, status=401)
+            if not User.objects.filter(email=email).exists() or checkpw:
+                return JsonResponse({"message": "INVALID_USER"}, status=401)
+
+            if checkpw:
+                token = jwt.encode({'user_email': email}, SECRET_KEY, algorithm='HS256')
+                return JsonResponse({"message": "SUCCESS", "token": token}, status=200)
 
         except KeyError:
             return JsonResponse({"message": "KEY_ERROR"}, status=400)

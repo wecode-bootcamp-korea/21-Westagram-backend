@@ -55,12 +55,9 @@ class PostingView(View):
             return JsonResponse({'message': 'NO_EXIST_USER'}, status=401)
 
     def get(self, request):
-        postings = Posting.objects.all()
-        result   = []
+        result   = [self.make_posting_response_data(posting) 
+                    for posting in Posting.objects.all()]
 
-        for posting in postings:
-            result.append(self.make_posting_response_data(posting))
-            
         return JsonResponse({'message': result}, status=200)
     
     def get(self, request, id):

@@ -63,5 +63,6 @@ class SigninView(View):
 
         except KeyError:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
-            
+        except User.DoesNotExist:
+            return JsonResponse({'message': 'INVALID_USER'}, status=400)
         

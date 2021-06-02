@@ -32,7 +32,7 @@ class SignupView(View):
             if not re.match(user_phone_number, data['phone_number']):
                 return JsonResponse({'message': 'INVALID_PHONE_NUMBER'}, status=400)
 
-            if not re.match(user_password, data['password']):
+            if re.match(user_password, data['password']):
                 return JsonResponse({'message': 'INVALID_PASSWORD'}, status=400)
 
             # 중복검사

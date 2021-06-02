@@ -13,14 +13,14 @@ class SignupView(View):
         try:
             user_email            = "(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
             user_phone_number     = '^[0-9]{3}-[0-9]{4}-[0-9]{4}$'
-            user_password         = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,18}$'
+            user_password         = '[A-Za-z0-9@#$]{8,}'
 
             data                  = json.loads(request.body)
             
             # email과 password의 값이 들어있지 않은 경우
             # email과 password의 KEY값이 일치하지 않을 경우 keyerror 리턴
             if '' == data['email']:
-                return JsonResponse({'message': 'INVALID_EMAI'}, status=400)
+                return JsonResponse({'message': 'INVALID_EMAIL'}, status=400)
 
             if '' == data['password']:
                 return JsonResponse({'message': 'INVALID_PASSWORD'}, status=400)
@@ -32,7 +32,7 @@ class SignupView(View):
             if not re.match(user_phone_number, data['phone_number']):
                 return JsonResponse({'message': 'INVALID_PHONE_NUMBER'}, status=400)
 
-            if re.match(user_password, data['password']):
+            if not re.match(user_password, data['password']):
                 return JsonResponse({'message': 'INVALID_PASSWORD'}, status=400)
 
             # 중복검사

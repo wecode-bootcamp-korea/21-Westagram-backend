@@ -32,7 +32,7 @@ class SignUpView(View):
                 return JsonResponse({"message":"KEY_ERROR"}, status = 400)
 
             if User.objects.filter(Q(phone_num=phone_num)|Q(name=name)).exists():
-                return JsonResponse({"message":"DUPLICATE_VALUEs"}, status = 409)
+                return JsonResponse({"message":"DUPLICATE_VALUE"}, status = 409)
 
             User.objects.create(
                 name      = name, 
@@ -56,14 +56,10 @@ class SignInView(View):
             email      = data['email']
             password   = data['password']
             email_dic  = {"email":email}
-            byte_pass  = password.encode('utf-8')
-            db_pass    = User.objects.get(email=data['email']).password
-            en_db_pass = db_pass.encode('utf-8')
-
-            if not email or not password:
-                return JsonResponse({"message":"KEY_ERROR"}, status = 400)
+            en_pass    = password.encode('utf-8')
+            en_db_pass = User.objects.get(email=email).password.encode('utf-8')
             
-            if not bcrypt.checkpw(byte_pass,en_db_pass):
+            if not bcrypt.checkpw(en_pass,en_db_pass):
                 return JsonResponse({"message":"INVALID_USER"}, status = 401)
 
             token = jwt.encode(email_dic, SECRET_KEY, ALGORITHM)

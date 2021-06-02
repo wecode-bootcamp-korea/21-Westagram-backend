@@ -32,7 +32,7 @@ class SignupView(View):
             if not re.match(user_phone_number, data['phone_number']):
                 return JsonResponse({'message': 'INVALID_PHONE_NUMBER'}, status=400)
 
-            if re.match(user_password, data['password']):
+            if not re.match(user_password, data['password']):
                 return JsonResponse({'message': 'INVALID_PASSWORD'}, status=400)
 
             # 중복검사
@@ -64,7 +64,7 @@ class SigninView(View):
             data = json.loads(request.body)
 
             if not User.objects.filter(email=data['email']).exists():
-                return JsonResponse({"message": "IVALID_USER"}, status=401)
+                return JsonResponse({"message": "INVALID_USER"}, status=401)
             user = User.objects.get(email=data['email'])
 
             # 비밀번호 확인
@@ -73,7 +73,7 @@ class SigninView(View):
                 token = jwt.encode({'eamil' : data['email']}, SECRET_KEY, algorithm="HS256")
                 return JsonResponse({"token": token}, status=200)
             else:
-                return JsonResponse({"message": "INVALID_USER"},status=401)
+                return JsonResponse({"message": "INVALID_USER"},status=402)
 
         except KeyError:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)

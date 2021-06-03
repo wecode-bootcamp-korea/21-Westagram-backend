@@ -6,7 +6,6 @@ from django.http  import JsonResponse
 from .models import Posting
 from user.models import User
 from my_settings import SECRET_KEY, ALGORITHM
-from django.db.models  import F
 
 class PostingView(View):
     

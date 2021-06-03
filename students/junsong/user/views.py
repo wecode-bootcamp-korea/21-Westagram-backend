@@ -5,7 +5,7 @@ from django.views     import View
 from django.http      import JsonResponse
 from django.db.models import Q
 
-from my_settings import SECRET_KEY
+from my_settings import SECRET_KEY, algorithm
 from .models     import User
 
 class SignUp(View):
@@ -59,12 +59,14 @@ class SignIn(View):
             user    = User.objects.get(email=email)
             checkpw = bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8'))
 
-            if not User.objects.filter(email=email).exists() or checkpw:
+            if not User.objects.filter(email=email).exists():
                 return JsonResponse({"message": "INVALID_USER"}, status=401)
 
-            if checkpw:
-                token = jwt.encode({'user_email': email}, SECRET_KEY, algorithm='HS256')
-                return JsonResponse({"message": "SUCCESS", "token": token}, status=200)
+            if not checkpw:
+                return JsonResponse({"message": "INVALID_USER"}, status=401)
+
+            token = jwt.encode({'user_email': email}, SECRET_KEY, algorithm=algorithm)
+            return JsonResponse({"message": "SUCCESS", "token": token}, status=200)
 
         except KeyError:
             return JsonResponse({"message": "KEY_ERROR"}, status=400)

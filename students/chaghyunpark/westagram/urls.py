@@ -17,4 +17,6 @@ from django.urls import path,include
 
 urlpatterns = [
     path('userapp',include('userapp.urls')),
+    path('board',include('board.urls')),
+
 ]

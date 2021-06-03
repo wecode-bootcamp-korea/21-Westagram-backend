@@ -14,7 +14,6 @@ class PostView(View):
          try:
             data  = json.loads(request.body)
             token = request.headers['token']
-            print(token)
             aut = jwt.decode(token,SECRET_KEY,ALGORITHM)
          
             if not User.objects.filter(email=aut['email']).exists():

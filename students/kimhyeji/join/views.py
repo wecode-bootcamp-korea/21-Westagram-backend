@@ -5,7 +5,6 @@ from django.http      import JsonResponse
 from django.views     import View
 
 from .models import User
-
 # Create your views here.
 
 class UserView(View):
@@ -13,9 +12,9 @@ class UserView(View):
 
         try:
             data = json.loads(request.body)
-            emailcheck = "^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$" 
+            email_regax  = "^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$" 
 
-            if re.match(emailcheck, data['email']):
+            if not re.match(email_regax, email=data['email']):
                 return JsonResponse({"message":"이메일형식이잘못되었습니다."}, status=400)
 
             if User.objects.filter(email=data['email']).exist():

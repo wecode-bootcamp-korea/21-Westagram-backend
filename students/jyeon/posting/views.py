@@ -41,32 +41,34 @@ class PostingView(View):
 
     @authorize_account
     def get(self, request, auth_account):
-        # try:
+        try:
 
-        # pagination & get paging index
-        pagination  = Paginator(Posting.objects.all(),3)
-        page        = int(request.GET.get('page'))
+            # pagination & get paging index
+            pagination  = Paginator(Posting.objects.all(),3)
+            page        = int(request.GET.get('page'))
 
-        result      = {}
-        result2     = []
-        result_list = []        
+            result      = {}
+            result2     = []
+            result_list = []        
 
-        # get posting for paging index
-        for posting in pagination.page(page):
-            result2 = []
+            # get posting for paging index
+            for posting in pagination.page(page):
+                result2 = []
+                
+                for image in Image.objects.filter(posting_text=posting):
+                    result2.append(image.posting_image)
+
+                result = {
+                    'account':posting.account.account,
+                    'datetime':posting.datetime,
+                    'text':posting.posting_text,
+                    'image': result2
+                }
+                result_list.append(result)
             
-            for image in Image.objects.filter(posting_text=posting):
-                result2.append(image.posting_image)
+            return JsonResponse({'message':result_list}, status=200)
 
-            result = {
-                'account':posting.account.account,
-                'datetime':posting.datetime,
-                'text':posting.posting_text,
-                'image': result2
-            }
-
-            result_list.append(result)
-
-        return JsonResponse({'message':result_list}, status=200)
-        # except:
-        #     return JsonResponse({'message':'ERROR'}, status=400)
+        except json.decoder.JSONDecodeError:
+            return JsonResponse({'message':'JSON DECODE ERROR'}, status=400)
+        except KeyError:
+            return JsonResponse({'message':'KEY ERROR'}, status=400)

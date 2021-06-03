@@ -1,6 +1,5 @@
-import json, re
-import bcrypt
-import jwt
+import json, re, bcrypt, jwt
+
 
 from django.core.exceptions import ObjectDoesNotExist
 from westagram.settings     import SECRET_KEY, ALGORITHM
@@ -14,7 +13,7 @@ class UserSignUp(View):
 
         email_regex       = '^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
         data              = json.loads(request.body)
-        signup_data       = User.objects.all()
+        signup_data       = User.objects
         hashed_pw         = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
         decoded_hashed_pw = hashed_pw.decode('utf-8')
         
@@ -49,42 +48,23 @@ class UserSignin(View):
         try:
             data            = json.loads(request.body)
             email           = data['email']
-            input_password  = data['password'].encode('utf-8')
+            password        = data['password'].encode('utf-8')
 
-            if email == "" or input_password == "":
+            if email == "" or password == "":
                 return JsonResponse({"message": "KEY_ERROR"}, status=400)
 
             signin_user  = User.objects.get(email=email)
-            db_password  = signin_user.password
-            db_password  = db_password.encode('utf-8')
+            encoded_db_password  = signin_user.password.encode('utf-8')
 
-            if not bcrypt.checkpw(input_password, db_password):
+            if not bcrypt.checkpw(password, encoded_db_password):
                 return JsonResponse({"message": "INVALID_USER"}, status=401)
 
             user       = {"user_id" : signin_user.id}
             encode_jwt = jwt.encode(user, SECRET_KEY, ALGORITHM)
-            decode_jwt = jwt.decode(encode_jwt, SECRET_KEY, ALGORITHM) 
-            return JsonResponse({"token" : decode_jwt, "message" : "SUCCESE!"}, status=200)
+            return JsonResponse({"token" : encode_jwt, "message" : "SUCCESE"}, status=200)
 
         except KeyError:
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
         except ObjectDoesNotExist:
             return JsonResponse({"message": "INVALID_USER"}, status=401)
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         

@@ -15,14 +15,11 @@ class PostingView(View):
         try:
             data = json.loads(request.body)
             token      = request.headers['token']
-            
+
             Posting.objects.create(
             img_url  = data['img_url'],
-            user     = jwt.encode(token, SECRET_KEY, algorithm=ALGORITHM)
+            user     = User.objects.get(email=jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)['account'])
             )
-
-            if not User.objects.filter(email = data['email']).exists():
-                return JsonResponse({'message': 'INVALID_USER'}, status= 401)
 
             return JsonResponse({'message': 'SUCCESS'}, status= 201)
 

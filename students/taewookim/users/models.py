@@ -8,3 +8,10 @@ class User(models.Model):
 
     class Meta:
         db_table = "users"
+
+class FollowingFollower(models.Model):
+    following_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+    follower_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower')
+
+    class Meta:
+        db_table = "following_followers"

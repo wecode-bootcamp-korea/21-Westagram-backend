@@ -67,9 +67,10 @@ class LoginView(View):
 
             user = User.objects.get(email=email)
              # 6/2 비밀번호 암호화 코드가 맞는지 안맞는지 체크
-            if bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+            if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+                  return JsonResponse({'message': 'INVALID_USER'}, status=401)
              # 6/2 로그인 성공시 토크값을 주는 코드     
-                return JsonResponse({'message': 'SUCCESS', 'user_token' : jwt.encode({'id': user.id}, SECRET_KEY, ALGORITHM)}, status=200)       
+            return JsonResponse({'message': 'SUCCESS', 'user_token' : jwt.encode({'id': user.id}, SECRET_KEY, ALGORITHM)}, status=200)       
         except KeyError:
            return JsonResponse({'message': 'KEY_ERROR'}, status=400)
                 

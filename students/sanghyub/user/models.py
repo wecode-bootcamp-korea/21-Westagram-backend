@@ -1,6 +1,5 @@
-from enum import unique
-from django.core.validators import validate_integer
-from django.db              import models
+from enum       import unique
+from django.db  import models
 
 
 class User(models.Model):

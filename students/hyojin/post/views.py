@@ -51,7 +51,7 @@ class PostUploadView(View):
             return JsonResponse({'message':'SUCCESS'}, status=201)
             
         except KeyError:
-            return JsonResponse({'message':'KEY_ERROR'}, status=200)
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
         
         except MultipleObjectsReturned:
             return JsonResponse({'message':"MULTIPLE_KEY_RETURN"}, status=500)

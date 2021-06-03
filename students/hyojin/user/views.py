@@ -25,7 +25,8 @@ class NewUserView(View):
             user.phone_number = self.check_blank(user.phone_number)
             user.nickname     = self.check_blank(user.nickname)
             
-            user.full_clean()
+            user.clean_fields()
+            user.validate_unique()
             user.save()
 
             return JsonResponse({'message':'SUCCESS'}, status=201)

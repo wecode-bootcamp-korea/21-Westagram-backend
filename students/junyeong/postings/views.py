@@ -13,7 +13,7 @@ class PostingView(View):
 
         try:
             data = json.loads(request.body)
-            print(User.email)
+            
             user = User.objects.get(email = data['email'])
 
             Posting.objects.create(
@@ -32,9 +32,10 @@ class PostingView(View):
 class Post_updateView(View):
 
     def get(self, request):
-        
+
         posting_data = Posting.objects.values()
         return JsonResponse({'posting_data': list(posting_data)}, status = 200)
+
 
 
     

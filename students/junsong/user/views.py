@@ -1,23 +1,26 @@
-import json, re
+import json, re, bcrypt, jwt
 from json.decoder import JSONDecodeError
 
 from django.views     import View
 from django.http      import JsonResponse
 from django.db.models import Q
 
-from .models import User
+from my_settings import SECRET_KEY, algorithm
+from .models     import User
 
 class SignUp(View):
     def post(self, request):
-        data     = json.loads(request.body)
-        email    = data['email']
-        password = data['password']
-        nickname = data['nickname']
-        contact  = data['contact']
-
-        EMAIL_REGEX = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,128}$'
-
         try:
+            data     = json.loads(request.body)
+            email    = data['email']
+            nickname = data['nickname']
+            contact  = data['contact']
+            password = data['password']
+
+            password_crypt = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+            EMAIL_REGEX = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,128}$'
+
             if not re.match(EMAIL_REGEX, email):
                 return JsonResponse({"message": "올바르지 않은 이메일 형식입니다."}, status=400)
 
@@ -29,11 +32,41 @@ class SignUp(View):
 
             User.objects.create(
                 email    = email,
-                password = password,
+                password = password_crypt,
                 nickname = nickname,
                 contact  = contact
             )
             return JsonResponse({"message": "SUCCESS"}, status=201)
+
+        except KeyError:
+            return JsonResponse({"message": "KEY_ERROR"}, status=400)
+        
+        except JSONDecodeError:
+            return JsonResponse({"message": "EMPTY_BODY_DATA"}, status=400)
+
+class SignIn(View):
+    def post(self, request):
+        try:
+            data     = json.loads(request.body)
+            email    = data['email']
+            password = data['password']
+
+            EMAIL_REGEX = '^([a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}){1,128}$'
+
+            if not re.match(EMAIL_REGEX, email):
+                return JsonResponse({"message": "올바르지 않은 이메일 형식입니다."}, status=400)
+            
+            user    = User.objects.get(email=email)
+            checkpw = bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8'))
+
+            if not User.objects.filter(email=email).exists():
+                return JsonResponse({"message": "INVALID_USER"}, status=401)
+
+            if not checkpw:
+                return JsonResponse({"message": "INVALID_USER"}, status=401)
+
+            token = jwt.encode({'user_email': email}, SECRET_KEY, algorithm=algorithm)
+            return JsonResponse({"message": "SUCCESS", "token": token}, status=200)
 
         except KeyError:
             return JsonResponse({"message": "KEY_ERROR"}, status=400)

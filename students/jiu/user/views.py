@@ -62,12 +62,11 @@ class LoginView(View) :
             data = json.loads(request.body)
             # email 존재여부
             email_set    = User.objects.get(email=data['email'])
-            access_token = jwt.encode({'email':data['email']}, SECRET_KEY, ALGORITHM)
-            
             # password 불일치시 INVALID_USER1 error
             if not bcrypt.checkpw(data['password'].encode('utf-8'), email_set.password.encode('utf-8')) :
                 return JsonResponse({'message':'INVALID_USER1'}, status=401)
-
+            
+            access_token = jwt.encode({'email':data['email']}, SECRET_KEY, ALGORITHM)
             return JsonResponse({'token':access_token,'message':'SUCCESS'}, status=200)
             
         except KeyError:

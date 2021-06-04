@@ -25,7 +25,6 @@ class SignView(View):
              if len(data['password']) <PASSWORD:
                 return JsonResponse({'MESSAGE':'PASS_KEY_ERROR'},status=400)
                 
-
              if User.objects.filter(
                 Q(email        = data['email'])| 
                 Q(nickname     = data['nickname'])|

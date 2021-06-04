@@ -69,7 +69,7 @@ class SigninView(View):
 
             # 비밀번호 확인
             if not bcrypt.checkpw(data['password'].encode('utf-8'), user.password.encode('utf-8')):
-                return JsonResponse({"message": "INVALID_USER"},status=400)
+                return JsonResponse({"message": "INVALID_USER"},status=401)
 
             # 토큰 발행
             token = jwt.encode({'eamil' : data['email']}, SECRET_KEY, algorithm="HS256")

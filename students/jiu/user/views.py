@@ -1,11 +1,14 @@
 import json
 import re
+import bcrypt
+import jwt
 
 from django.views     import View
 from django.http      import JsonResponse
 from django.db.models import Q
 
 from .models          import User
+from my_settings      import SECRET_KEY, ALGORITHM
 
 
 class NewUserView(View) :
@@ -21,8 +24,8 @@ class NewUserView(View) :
 
             # nickname, email, phone_number 중복 error
             if User.objects.filter(
-                Q(nickname    =data['nickname']) or
-                Q(email       =data['email'])    or
+                Q(nickname=data['nickname'])|
+                Q(email=data['email'])|
                 Q(phone_number=data['phone_number'])
             ).exists() :
                 return JsonResponse({'message':'ALREADY_EXISTS'}, status=400)
@@ -38,22 +41,36 @@ class NewUserView(View) :
             # phone_number (len == 11(3,4,4))
             if not re.match(re_phone_number, data['phone_number'])  :
                 return JsonResponse({'message':'PHONE_NUMBER_ERROR'}, status=400) 
-
+            
             # create
             User.objects.create(
                 nickname    =data['nickname'],
                 email       =data['email'],
-                password    =data['password'],
+                password    =bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
                 phone_number=data['phone_number']
                 )
             return JsonResponse({'message':'SUCCESS'}, status=201)
 
-            
         except KeyError :
             return JsonResponse({"message": "KEY_ERROR"}, status=400)
 
-        
+class LoginView(View) :
 
-        
+    def post(self, request) :
 
+        try :
+            data = json.loads(request.body)
+            # email 존재여부
+            email_set    = User.objects.get(email=data['email'])
+            # password 불일치시 INVALID_USER1 error
+            if not bcrypt.checkpw(data['password'].encode('utf-8'), email_set.password.encode('utf-8')) :
+                return JsonResponse({'message':'INVALID_USER1'}, status=401)
+            
+            access_token = jwt.encode({'email':data['email']}, SECRET_KEY, ALGORITHM)
+            return JsonResponse({'token':access_token,'message':'SUCCESS'}, status=200)
+            
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
 
+        except User.DoesNotExist:
+            return JsonResponse({'message':'INVALID_USER2'}, status=401)

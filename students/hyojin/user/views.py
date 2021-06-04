@@ -4,7 +4,7 @@ import bcrypt
 
 from django.views           import View
 from django.http            import JsonResponse
-from django.core.exceptions import ValidationError
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
 
 from .models import User
 from my_settings import SECRET_KEY, ALGORITHM
@@ -25,7 +25,8 @@ class NewUserView(View):
             user.phone_number = self.check_blank(user.phone_number)
             user.nickname     = self.check_blank(user.nickname)
             
-            user.full_clean()
+            user.clean_fields()
+            user.validate_unique()
             user.save()
 
             return JsonResponse({'message':'SUCCESS'}, status=201)
@@ -37,9 +38,7 @@ class NewUserView(View):
             return JsonResponse({'message':e.message_dict}, status=400)
 
     def make_hash_value(self, value):
-        result = bcrypt.hashpw(value.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-        return result
+        return bcrypt.hashpw(value.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     def check_blank(self, value):
         if value == "":
@@ -71,3 +70,6 @@ class SignInView(View):
         
         except User.DoesNotExist:
             return JsonResponse({'message':'INVALID_USER'}, status=401)
+
+        except MultipleObjectsReturned:
+            return JsonResponse({'message':"Multiple_KEY_RETURN"}, status=500)

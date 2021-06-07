@@ -63,5 +63,5 @@ class SigninView(View):
             return JsonResponse({'token': token, 'message': 'SUCCESS'}, status=200)
 
         except KeyError:
-            return JsonResponse({'massage': 'KEY_ERROR'}, status=400)
+            return JsonResponse({'message': 'KEY_ERROR'}, status=400)
         

@@ -18,5 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('users', include('users.urls')),
+    path('postings', include('postings.urls')),
     # ~:8000/ '/'가 이미 있으니 첫 usrls는 붙일필요가 없다.
 ]

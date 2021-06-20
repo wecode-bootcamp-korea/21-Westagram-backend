@@ -1,6 +1,4 @@
 # westagram-backend
-자세한 과정은 guide 디렉토리 내부를 참고해주세요.
-
 ## 초기 세팅 및 진행 방법
 - 원하는 directory 이동 후 해당 repo를 clone 받아주세요.
 - main 브랜치를 기준으로 `feature/이름-구현중인기능` 브랜치를 만들어주세요. (ex. `feature/kyunghun-initail-seting`, `feature/kyunhun-signup`)
